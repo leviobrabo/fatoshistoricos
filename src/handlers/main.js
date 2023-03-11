@@ -8,8 +8,13 @@ const { ChatModel } = require('../database')
 bot.on('new_chat_members', async (msg) => {
   const chatId = msg.chat.id
   const chatName = msg.chat.title
+    const thankYouMessage = `Olá a todos! Obrigado por me adicionar a este grupo. \n\nEu enviarei uma lista de acontecimentos históricos ocorridos no dia, diariamente às 8h, 15h e 22h. 😊`
+
 
   try {
+  
+        await bot.sendMessage(chatId, thankYouMessage)
+
     // Armazena o grupo no banco de dados
     const chat = await ChatModel.create({ chatId, chatName })
     console.log(`Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`)
