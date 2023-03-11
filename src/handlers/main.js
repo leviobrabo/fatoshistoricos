@@ -65,7 +65,7 @@ const morningJob = new CronJob('0 8 * * *', async function() {
   }
 }, null, true, 'America/Sao_Paulo');
 
-const eveningJob = new CronJob('0 15 * * *', async function() {
+const eveningJob = new CronJob('45 12 * * *', async function() {
   const chatModels = await ChatModel.find({});
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
