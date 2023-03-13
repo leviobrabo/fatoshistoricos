@@ -91,11 +91,16 @@ nightJob.start();
 
 
 
-
-
-
-
 const groupId = process.env.groupId; // grupo onde a mensagem sobre novos grupos será enviada
+
+// Função que envia mensagem para o grupo especificado
+async function sendGroupMessage(message) {
+  try {
+    await bot.sendMessage(groupId, message)
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 // Comando /stats
 bot.onText(/\/stats/, async (msg, match) => {
@@ -109,23 +114,18 @@ bot.onText(/\/stats/, async (msg, match) => {
   }
 })
 
-// Enviar mensagem sempre que o bot for adicionado a um novo grupo
-bot.on('new_chat_members', async (msg) => {
-  const chatId = msg.chat.id;
-  const chat = await ChatModel.findOne({ chatId });
-  if (chat) {
-    return;
-  }
-  
-  const groupName = msg.chat.title;
-  const groupId = msg.chat.id;
-  const message = `#Fatoshistbot #New_Group\n\n*Group:* ${chatName}\n*ID:* ${chatId}`;
-  bot.sendMessage(groupId, message);
-});
-
-bot.on('polling_error', (error) => {
-  console.error(error)
+// Evento que é disparado quando um novo grupo é adicionado
+bot.on('newChatMembers', async (msg) => {
+  const groupName = msg.chat.title
+  const chatId = msg.chat.id
+  const message = `#Fatoshistbot #New_Group\n\n*Group:* ${groupName}\n*ID:* ${chatId}`
+  await ChatModel.create({ chatId })
+  await sendGroupMessage(message)
 })
+
+
+
+
 
 
 
