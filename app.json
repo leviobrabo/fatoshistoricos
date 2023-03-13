@@ -20,6 +20,12 @@
         "description": "Create database ate MongoDB Atlas https://www.mongodb.com/ create new cluster and get url for connection.",
         "value": "",
         "required": true
+      },
+      "groupId": {
+        "description": "Group ID LOG Telegram.",
+        "value": "",
+        "required": true
       }
     }
   }
+
