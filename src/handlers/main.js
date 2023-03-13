@@ -91,40 +91,32 @@ nightJob.start();
 
 
 
-const groupId = process.env.groupId; // grupo onde a mensagem sobre novos grupos será enviada
 
-// Função que envia mensagem para o grupo especificado
-async function sendGroupMessage(message) {
+
+const groupId = process.env.groupId;
+
+// Listen for the /stats command and send bot statistics
+bot.onText(/\/stats/, async (msg) => {
   try {
-    await bot.sendMessage(groupId, message)
+    const count = await ChatModel.countDocuments();
+    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ Groups: ${count}`;
+    bot.sendMessage(msg.chat.id, message);
   } catch (error) {
-    console.error(error)
+    console.error(error);
+    bot.sendMessage(msg.chat.id, 'An error occurred while retrieving bot statistics.');
   }
-}
+});
 
-// Comando /stats
-bot.onText(/\/stats/, async (msg, match) => {
-  try {
-    const count = await ChatModel.countDocuments()
-    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ Groups: ${count}`
-    bot.sendMessage(msg.chat.id, message)
-  } catch (error) {
-    console.error(error)
-    bot.sendMessage(msg.chat.id, 'Ocorreu um erro ao buscar as estatísticas do bot.')
-  }
-})
+// Listen for the "save" event on the ChatModel schema and send a message to the group
+ChatModel.on('save', (chat) => {
+  const message = `#Fatoshisbot #New_Group\n\n*Group:* ${chat.name}\n*ID:* ${chat.chatId}`;
+  bot.sendMessage(groupId, message, { parse_mode: 'markdown' });
+});
 
-// Evento que é disparado quando um novo grupo é adicionado
-bot.on('newChatMembers', async (msg) => {
-  const groupName = msg.chat.title
-  const chatId = msg.chat.id
-  const message = `#Fatoshistbot #New_Group\n\n*Group:* ${groupName}\n*ID:* ${chatId}`
-  await ChatModel.create({ chatId })
-  await sendGroupMessage(message)
-})
-
-
-
+// Listen for polling errors
+bot.on('polling_error', (error) => {
+  console.error(error);
+});
 
 
 
