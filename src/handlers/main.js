@@ -107,15 +107,19 @@ bot.onText(/\/stats/, async (msg) => {
   }
 });
 
-// Listen for the "save" event on the ChatModel schema and send a message to the group
+// Enviar mensagem sempre que um novo usuário for salvo no banco de dados
 ChatModel.on('save', (chat) => {
-  const message = `#Fatoshisbot #New_Group\n\n*Group:* ${chat.name}\n*ID:* ${chat.chatId}`;
-  bot.sendMessage(groupId, message, { parse_mode: 'markdown' });
+  const message = `#Togurosbot #New_Group
+  <b>Group:</b> <a href="tg://resolve?domain=${chat.chatName}&amp;id=${chat.chatId}">${chat.chatName}</a>
+  <b>ID:</b> <code>${chat.chatId}</code>`;
+  bot.sendMessage(groupId, message, { parse_mode: "HTML" })
+    .catch(error => {
+      console.error(`Erro ao enviar mensagem para o grupo ${groupId}: ${error}`);
+    });
 });
 
-// Listen for polling errors
 bot.on('polling_error', (error) => {
-  console.error(error);
+  console.error(`Erro no bot de polling: ${error}`);
 });
 
 
