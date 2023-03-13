@@ -92,7 +92,7 @@ nightJob.start();
 
 
 
-const { ChatModel } = require('../database')
+
 
 const groupId = process.env.groupId; // grupo onde a mensagem sobre novos grupos será enviada
 
