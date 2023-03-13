@@ -92,22 +92,41 @@ nightJob.start();
 
 
 
+const { ChatModel } = require('../database')
+
+const groupId = process.env.groupId; // grupo onde a mensagem sobre novos grupos será enviada
 
 // Comando /stats
 bot.onText(/\/stats/, async (msg, match) => {
-  try {
-    const count = await ChatModel.countDocuments()
-    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ Groups: ${count}`
-    bot.sendMessage(msg.chat.id, message)
-  } catch (error) {
-    console.error(error)
-    bot.sendMessage(msg.chat.id, 'Ocorreu um erro ao buscar as estatísticas do bot.')
-  }
+  try {
+    const count = await ChatModel.countDocuments()
+    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ Groups: ${count}`
+    bot.sendMessage(msg.chat.id, message)
+  } catch (error) {
+    console.error(error)
+    bot.sendMessage(msg.chat.id, 'Ocorreu um erro ao buscar as estatísticas do bot.')
+  }
 })
 
+// Enviar mensagem sempre que o bot for adicionado a um novo grupo
+bot.on('new_chat_members', async (msg) => {
+  const chatId = msg.chat.id;
+  const chat = await ChatModel.findOne({ chatId });
+  if (chat) {
+    return;
+  }
+  
+  const groupName = msg.chat.title;
+  const groupId = msg.chat.id;
+  const message = `#Fatoshistbot #New_Group\n\n*Group:* ${groupName}\n*ID:* ${groupId}`;
+  bot.sendMessage(groupId, message);
+});
+
 bot.on('polling_error', (error) => {
-  console.error(error)
+  console.error(error)
 })
+
+
 
 
 
