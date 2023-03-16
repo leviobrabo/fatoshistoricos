@@ -6,6 +6,25 @@ const { ChatModel } = require('../database')
 const { UserModel } = require('../database')
 
 
+bot.on('message', async (msg) => {
+  if (msg.chat.type === 'private') {
+    const user = new UserModel({
+      user_id: msg.from.id,
+      username: msg.from.username,
+      firstname: msg.from.first_name,
+      lastname: msg.from.last_name,
+    });
+
+    try {
+      await user.save();
+      console.log(`User ${msg.from.id} saved to database.`);
+    } catch (error) {
+      console.error(`Error saving user ${msg.from.id} to database: ${error.message}`);
+    }
+  }
+});
+
+
 bot.on('new_chat_members', async (msg) => {
   const chatId = msg.chat.id
   const chatName = msg.chat.title
