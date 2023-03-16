@@ -26,8 +26,8 @@ bot.on('message', async (msg) => {
 
 UserModel.on('save', (user) => {
   const message = `#Fatoshistbot #New_User
-  <b>User:</b> <a href="tg://user?id=${user.userID}">${user.firstName}</a>
-  <b>ID:</b> <code>${user.userID}</code>
+  <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname}</a>
+  <b>ID:</b> <code>${user.user_id}</code>
   <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"}`;
 bot.sendMessage(groupId, message, { parse_mode: "HTML" })
 });
