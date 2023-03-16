@@ -24,6 +24,17 @@ bot.on('message', async (msg) => {
   }
 });
 
+UserModel.on('save', (user) => {
+  const message = `#Fatoshistbot #New_User
+  <b>User:</b> <a href="tg://user?id=${user.userID}">${user.firstName}</a>
+  <b>ID:</b> <code>${user.userID}</code>
+  <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"}`;
+bot.sendMessage(groupId, message, { parse_mode: "HTML" })
+});
+bot.on('polling_error', (error) => {
+console.error(error);
+});
+
 
 bot.on('new_chat_members', async (msg) => {
   const chatId = msg.chat.id
