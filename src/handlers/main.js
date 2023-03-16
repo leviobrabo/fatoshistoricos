@@ -78,8 +78,12 @@ async function getHistoricalEvents() {
   return eventText;
 }
 
-// Função para enviar a mensagem para o grupo
 async function sendHistoricalEvents(chatId) {
+  // Verifica se o chatId é igual ao groupId a ser evitado
+  if (chatId === groupId) {
+    console.log(`Mensagem não enviada para grupo ${chatId}`);
+    return;
+  }
   const events = await getHistoricalEvents();
 
   if (events) {
