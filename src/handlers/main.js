@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const CronJob = require('cron').CronJob;
 const { ChatModel } = require('../database')
+const { UserModel } = require('../database')
 
 
 bot.on('new_chat_members', async (msg) => {
@@ -95,16 +96,12 @@ nightJob.start();
 
 const groupId = process.env.groupId;
 
-// Listen for the /stats command and send bot statistics
 bot.onText(/\/stats/, async (msg) => {
-  try {
-    const count = await ChatModel.countDocuments();
-    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ Groups: ${count}`;
-    bot.sendMessage(msg.chat.id, message);
-  } catch (error) {
-    console.error(error);
-    bot.sendMessage(msg.chat.id, 'An error occurred while retrieving bot statistics.');
-  }
+  const chatId = msg.chat.id;
+  const numUsers = await UserModel.countDocuments();
+  const numChats = await ChatModel.countDocuments();
+  const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
+  bot.sendMessage(chatId, message);
 });
 
 // Enviar mensagem sempre que um novo usuário for salvo no banco de dados
