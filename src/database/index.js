@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const ChatSchema = require("./models/groups");
+const userSchema = require("./models/users");
 
 
 
@@ -13,7 +14,8 @@ mongoose.connect(process.env.DB_STRING, {
 
 
 const ChatModel = mongoose.model('Chat', ChatSchema)
+const UserModel = mongoose.model('User', userSchema);
 
 
 
-module.exports = { ChatModel }
+module.exports = { ChatModel, UserModel }
