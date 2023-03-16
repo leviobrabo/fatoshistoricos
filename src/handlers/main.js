@@ -18,21 +18,20 @@ bot.on('message', async (msg) => {
     try {
       await user.save();
       console.log(`User ${msg.from.id} saved to database.`);
+
+      const message = `#Fatoshistbot #New_User
+      <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname}</a>
+      <b>ID:</b> <code>${user.user_id}</code>
+      <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"}`;
+      bot.sendMessage(groupId, message, { parse_mode: "HTML" });
     } catch (error) {
       console.error(`Error saving user ${msg.from.id} to database: ${error.message}`);
     }
   }
 });
 
-UserModel.on('save', (user) => {
-  const message = `#Fatoshistbot #New_User
-  <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname}</a>
-  <b>ID:</b> <code>${user.user_id}</code>
-  <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"}`;
-bot.sendMessage(groupId, message, { parse_mode: "HTML" })
-});
 bot.on('polling_error', (error) => {
-console.error(error);
+  console.error(error);
 });
 
 
