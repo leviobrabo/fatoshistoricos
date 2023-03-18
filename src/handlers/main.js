@@ -129,9 +129,6 @@ nightJob.start();
 
 
 
-
-const groupId = process.env.groupId;
-
 bot.onText(/\/stats/, async (msg) => {
   const chatId = msg.chat.id;
   const numUsers = await UserModel.countDocuments();
