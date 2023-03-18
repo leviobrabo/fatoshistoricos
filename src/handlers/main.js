@@ -10,35 +10,36 @@ const groupId = process.env.groupId;
 
 
 bot.on('message', async (msg) => {
-  if (msg.chat.type === 'private') {
-    const existingUser = await UserModel.findOne({ user_id: msg.from.id });
+  try {
+    if ((msg.chat.type === 'private' && msg.entities && msg.entities[0].type === 'bot_command') || 
+        ((msg.chat.type === 'group' || msg.chat.type === 'supergroup') && msg.entities && msg.entities[0].type === 'bot_command')) {
 
-    if (existingUser) {
-      console.log(`User ${msg.from.id} already exists in database.`);
-      return;
-    }
+      const existingUser = await UserModel.findOne({ user_id: msg.from.id });
+      if (existingUser) {
+        return;
+      }
 
-    const user = new UserModel({
-      user_id: msg.from.id,
-      username: msg.from.username,
-      firstname: msg.from.first_name,
-      lastname: msg.from.last_name,
-    });
+      const user = new UserModel({
+        user_id: msg.from.id,
+        username: msg.from.username,
+        firstname: msg.from.first_name,
+        lastname: msg.from.last_name,
+      });
 
-    try {
       await user.save();
-      console.log(`User ${msg.from.id} saved to database.`);
+      console.log(`Usuário ${msg.from.id} salvo no banco de dados.`);
 
       const message = `#Fatoshistbot #New_User
-      <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname}</a>
-      <b>ID:</b> <code>${user.user_id}</code>
-      <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"}`;
+        <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname}</a>
+        <b>ID:</b> <code>${user.user_id}</code>
+        <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"}`;
       bot.sendMessage(groupId, message, { parse_mode: "HTML" });
-    } catch (error) {
-      console.error(`Error saving user ${msg.from.id} to database: ${error.message}`);
     }
+  } catch (error) {
+    console.error(`Erro em salvar o usuário ${msg.from.id} no banco de dados: ${error.message}`);
   }
 });
+
 
 bot.on('polling_error', (error) => {
   console.error(error);
