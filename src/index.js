@@ -14,6 +14,6 @@ const startCommand = require('./commands/start');
 bot.onText(/\/start/, startCommand);
 
 const histimag = require('./commands/histimag');
-bot.onText(/^\/presidente/, async(message) => {
+bot.onText(/^\/fotoshist/, async(message) => {
     await histimag(bot, message);
   });
