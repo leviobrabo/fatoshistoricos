@@ -11,9 +11,12 @@ const {bot} = require('./bot')
 
 
 const startCommand = require('./commands/start');
+const { histimag } = require('./commands/histimag');
+
+
+
 bot.onText(/\/start/, startCommand);
 
-const histimag = require('./commands/histimag');
-bot.onText(/^\/fotoshist/, async(message) => {
+bot.onText(/^\/fotoshist/, async (message) => {
     await histimag(bot, message);
   });
