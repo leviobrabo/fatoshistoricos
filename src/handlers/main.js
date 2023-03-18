@@ -6,6 +6,9 @@ const { ChatModel } = require('../database')
 const { UserModel } = require('../database')
 
 
+const groupId = process.env.groupId;
+
+
 bot.on('message', async (msg) => {
   if (msg.chat.type === 'private') {
     const user = new UserModel({
