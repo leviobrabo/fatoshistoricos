@@ -11,6 +11,13 @@ const groupId = process.env.groupId;
 
 bot.on('message', async (msg) => {
   if (msg.chat.type === 'private') {
+    const existingUser = await UserModel.findOne({ user_id: msg.from.id });
+
+    if (existingUser) {
+      console.log(`User ${msg.from.id} already exists in database.`);
+      return;
+    }
+
     const user = new UserModel({
       user_id: msg.from.id,
       username: msg.from.username,
@@ -38,33 +45,39 @@ bot.on('polling_error', (error) => {
 });
 
 
-bot.on('new_chat_members', async (msg) => {
-  const chatId = msg.chat.id
-  const chatName = msg.chat.title
 
+bot.on('new_chat_members', async (msg) => {
+  const chatId = msg.chat.id;
+  const chatName = msg.chat.title;
 
   try {
- 
+    const existingChat = await ChatModel.findOne({ chatId });
+
+    if (existingChat) {
+      console.log(`Chat ${chatName} (${chatId}) already exists in database.`);
+      return;
+    }
 
     // Armazena o grupo no banco de dados
-    const chat = await ChatModel.create({ chatId, chatName })
-    console.log(`Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`)
+    const chat = await ChatModel.create({ chatId, chatName });
+    console.log(`Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`);
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
-})
+});
 
 bot.on('left_chat_member', async (msg) => {
-  const chatId = msg.chat.id
+  const chatId = msg.chat.id;
 
   try {
     // Remove o grupo do banco de dados
-    const chat = await ChatModel.findOneAndDelete({ chatId })
-    console.log(`Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`)
+    const chat = await ChatModel.findOneAndDelete({ chatId });
+    console.log(`Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`);
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
-})
+});
+
 
 let day, month;
 
