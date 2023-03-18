@@ -154,13 +154,6 @@ bot.on('polling_error', (error) => {
 
 
 
-
-
-
-
-
-
-
 function initializeMainModule() {
   return bot;
 }
