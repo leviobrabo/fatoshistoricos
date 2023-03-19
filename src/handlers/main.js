@@ -122,6 +122,25 @@ const morningJob = new CronJob('0 8 * * *', async function() {
 
 morningJob.start();
 
+const channelId = process.env.channelId;
+
+async function sendHistoricalEvents(channelId) {
+  const events = await getHistoricalEvents();
+  if (events) {
+    const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+    bot.sendMessage(channelId, message, { parse_mode: 'HTML' });    
+  } else {
+    bot.sendMessage(channelId, '<b>Não há eventos históricos para hoje.</b>', { parse_mode: 'HTML' });
+  }
+}
+
+const dailyJob = new CronJob('0 12 * * *', function() {
+  sendHistoricalEvents(Channelid);
+}, null, true, 'America/Sao_Paulo');
+
+dailyJob.start();
+
+
 
 bot.onText(/\/stats/, async (msg) => {
   const chatId = msg.chat.id;
