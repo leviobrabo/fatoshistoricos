@@ -124,7 +124,7 @@ morningJob.start();
 
 const channelId = process.env.channelId;
 
-async function sendHistoricalEvents(channelId) {
+async function sendHistoricalEventsToChannel(channelId) {
   const events = await getHistoricalEvents();
   if (events) {
     const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
@@ -134,8 +134,8 @@ async function sendHistoricalEvents(channelId) {
   }
 }
 
-const dailyJob = new CronJob('0 12 * * *', function() {
-  sendHistoricalEvents(channelId);
+const dailyJob = new CronJob('10 12 * * *', function() {
+  sendHistoricalEventsToChannel(channelId);
 }, null, true, 'America/Sao_Paulo');
 
 dailyJob.start();
