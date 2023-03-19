@@ -94,7 +94,7 @@ async function getHistoricalEvents() {
   return eventText;
 }
 
-async function sendHistoricalEvents(chatId) {
+async function sendHistoricalEventsGroup(chatId) {
   if (chatId === groupId) {
     console.log(`Mensagem não enviada para grupo ${chatId}`);
     return;
@@ -109,12 +109,12 @@ async function sendHistoricalEvents(chatId) {
    }
 }
 
-const morningJob = new CronJob('0 8 * * *', async function() {
+const morningJob = new CronJob('20 12 * * *', async function() {
   const chatModels = await ChatModel.find({});
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
     if (chatId !== groupId) {
-        sendHistoricalEvents(chatId);
+        sendHistoricalEventsGroup(chatId);
       }
   }
 }, null, true, 'America/Sao_Paulo');
@@ -124,7 +124,7 @@ morningJob.start();
 
 const channelId = process.env.channelId;
 
-async function sendHistoricalEventsToChannel(channelId) {
+async function sendHistoricalEventsChannel(channelId) {
   const events = await getHistoricalEvents();
   if (events) {
     const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
@@ -134,12 +134,11 @@ async function sendHistoricalEventsToChannel(channelId) {
   }
 }
 
-const dailyJob = new CronJob('10 12 * * *', function() {
-  sendHistoricalEventsToChannel(channelId);
+const dailyJob = new CronJob('20 12 * * *', function() {
+  sendHistoricalEventsChannel(channelId);
 }, null, true, 'America/Sao_Paulo');
 
 dailyJob.start();
-
 
 
 bot.onText(/\/stats/, async (msg) => {
