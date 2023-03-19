@@ -95,7 +95,7 @@ async function getHistoricalEvents() {
   return eventText;
 }
 
-async function sendHistoricalEvents(chatId) {
+async function sendHistoricalEvents(chatId, isChannel = false) {
   // Verifica se o chatId é igual ao groupId a ser evitado
   if (chatId === groupId) {
     console.log(`Mensagem não enviada para grupo ${chatId}`);
@@ -105,9 +105,13 @@ async function sendHistoricalEvents(chatId) {
 
   if (events) {
     const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-    bot.sendMessage(chatId, message, { parse_mode: 'HTML' });    
+    if (isChannel) {
+      bot.sendMessage(chatId, message, { parse_mode: 'HTML', disable_web_page_preview: true });
+    } else {
+      bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
+    }
   } else {
-    bot.sendMessage(chatId, '<b>Não há eventos históricos para hoje.</b>', { parse_mode: 'HTML' });   
+    bot.sendMessage(chatId, '<b>Não há eventos históricos para hoje.</b>', { parse_mode: 'HTML' });
   }
 }
 
@@ -115,31 +119,39 @@ const morningJob = new CronJob('0 8 * * *', async function() {
   const chatModels = await ChatModel.find({});
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
-    sendHistoricalEvents(chatId);
+    if (chatId !== groupId) {
+      if (chatModel.type === 'group') {
+        sendHistoricalEvents(chatId);
+      } else if (chatModel.type === 'channel') {
+        sendHistoricalEvents(chatId, true);
+      }
+    }
   }
 }, null, true, 'America/Sao_Paulo');
 
 const eveningJob = new CronJob('0 15 * * *', async function() {
-  const chatModels = await ChatModel.find({});
+  const chatModels = await ChatModel.find({ type: 'group' });
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
-    sendHistoricalEvents(chatId);
+    if (chatId !== groupId) {
+      sendHistoricalEvents(chatId);
+    }
   }
 }, null, true, 'America/Sao_Paulo');
 
 const nightJob  = new CronJob('0 22 * * *', async function() {
-  const chatModels = await ChatModel.find({});
+  const chatModels = await ChatModel.find({ type: 'group' });
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
-    sendHistoricalEvents(chatId);
+    if (chatId !== groupId) {
+      sendHistoricalEvents(chatId);
+    }
   }
 }, null, true, 'America/Sao_Paulo');
 
 morningJob.start();
 eveningJob.start();
 nightJob.start();
-
-
 
 
 
