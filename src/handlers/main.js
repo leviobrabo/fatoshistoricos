@@ -109,7 +109,7 @@ async function sendHistoricalEventsGroup(chatId) {
    }
 }
 
-const morningJob = new CronJob('20 12 * * *', async function() {
+const morningJob = new CronJob('0 8 * * *', async function() {
   const chatModels = await ChatModel.find({});
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
@@ -134,7 +134,7 @@ async function sendHistoricalEventsChannel(channelId) {
   }
 }
 
-const dailyJob = new CronJob('20 12 * * *', function() {
+const dailyJob = new CronJob('30 12 * * *', function() {
   sendHistoricalEventsChannel(channelId);
 }, null, true, 'America/Sao_Paulo');
 
