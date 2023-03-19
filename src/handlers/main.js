@@ -82,6 +82,7 @@ bot.on('left_chat_member', async (msg) => {
 
 let day, month;
 
+
 async function getHistoricalEvents() {
   const today = new Date();
   day = today.getDate();
@@ -95,7 +96,7 @@ async function getHistoricalEvents() {
   return eventText;
 }
 
-async function sendHistoricalEvents(chatId, isChannel = false) {
+async function sendHistoricalEvents(chatId) {
   // Verifica se o chatId é igual ao groupId a ser evitado
   if (chatId === groupId) {
     console.log(`Mensagem não enviada para grupo ${chatId}`);
@@ -105,27 +106,19 @@ async function sendHistoricalEvents(chatId, isChannel = false) {
 
   if (events) {
     const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-    if (isChannel) {
-      bot.sendMessage(chatId, message, { parse_mode: 'HTML', disable_web_page_preview: true });
-    } else {
-      bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
-    }
-  } else {
-    bot.sendMessage(chatId, '<b>Não há eventos históricos para hoje.</b>', { parse_mode: 'HTML' });
-  }
+        bot.sendMessage(chatId, message, { parse_mode: 'HTML' });    
+} else {
+  bot.sendMessage(chatId, '<b>Não há eventos históricos para hoje.</b>', { parse_mode: 'HTML' });
+   }
 }
 
-const morningJob = new CronJob('0 8 * * *', async function() {
+const morningJob = new CronJob('40 11 * * *', async function() {
   const chatModels = await ChatModel.find({});
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
     if (chatId !== groupId) {
-      if (chatModel.type === 'group') {
         sendHistoricalEvents(chatId);
-      } else if (chatModel.type === 'channel') {
-        sendHistoricalEvents(chatId, true);
       }
-    }
   }
 }, null, true, 'America/Sao_Paulo');
 
@@ -152,7 +145,6 @@ const nightJob  = new CronJob('0 22 * * *', async function() {
 morningJob.start();
 eveningJob.start();
 nightJob.start();
-
 
 
 bot.onText(/\/stats/, async (msg) => {
