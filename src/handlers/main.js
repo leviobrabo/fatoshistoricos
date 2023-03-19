@@ -59,7 +59,6 @@ bot.on('new_chat_members', async (msg) => {
       return;
     }
 
-    // Armazena o grupo no banco de dados
     const chat = await ChatModel.create({ chatId, chatName });
     console.log(`Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`);
   } catch (err) {
@@ -71,7 +70,6 @@ bot.on('left_chat_member', async (msg) => {
   const chatId = msg.chat.id;
 
   try {
-    // Remove o grupo do banco de dados
     const chat = await ChatModel.findOneAndDelete({ chatId });
     console.log(`Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`);
   } catch (err) {
@@ -97,7 +95,6 @@ async function getHistoricalEvents() {
 }
 
 async function sendHistoricalEvents(chatId) {
-  // Verifica se o chatId é igual ao groupId a ser evitado
   if (chatId === groupId) {
     console.log(`Mensagem não enviada para grupo ${chatId}`);
     return;
@@ -112,7 +109,7 @@ async function sendHistoricalEvents(chatId) {
    }
 }
 
-const morningJob = new CronJob('40 11 * * *', async function() {
+const morningJob = new CronJob('0 8 * * *', async function() {
   const chatModels = await ChatModel.find({});
   for (const chatModel of chatModels) {
     const chatId = chatModel.chatId;
@@ -122,29 +119,8 @@ const morningJob = new CronJob('40 11 * * *', async function() {
   }
 }, null, true, 'America/Sao_Paulo');
 
-const eveningJob = new CronJob('0 15 * * *', async function() {
-  const chatModels = await ChatModel.find({ type: 'group' });
-  for (const chatModel of chatModels) {
-    const chatId = chatModel.chatId;
-    if (chatId !== groupId) {
-      sendHistoricalEvents(chatId);
-    }
-  }
-}, null, true, 'America/Sao_Paulo');
-
-const nightJob  = new CronJob('0 22 * * *', async function() {
-  const chatModels = await ChatModel.find({ type: 'group' });
-  for (const chatModel of chatModels) {
-    const chatId = chatModel.chatId;
-    if (chatId !== groupId) {
-      sendHistoricalEvents(chatId);
-    }
-  }
-}, null, true, 'America/Sao_Paulo');
 
 morningJob.start();
-eveningJob.start();
-nightJob.start();
 
 
 bot.onText(/\/stats/, async (msg) => {
@@ -155,7 +131,6 @@ bot.onText(/\/stats/, async (msg) => {
   bot.sendMessage(chatId, message);
 });
 
-// Enviar mensagem sempre que um novo usuário for salvo no banco de dados
 ChatModel.on('save', (chat) => {
   const message = `#Togurosbot #New_Group
   <b>Group:</b> <a href="tg://resolve?domain=${chat.chatName}&amp;id=${chat.chatId}">${chat.chatName}</a>
