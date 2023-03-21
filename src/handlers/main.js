@@ -134,7 +134,7 @@ async function sendHistoricalEventsChannel(channelId) {
   }
 }
 
-const dailyJob = new CronJob('0 8 * * *', function() {
+const dailyJob = new CronJob('0 6 * * *', function() {
   sendHistoricalEventsChannel(channelId);
 }, null, true, 'America/Sao_Paulo');
 
