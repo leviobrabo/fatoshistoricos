@@ -109,10 +109,6 @@ async function getHistoricalEvents() {
 }
 
 async function sendHistoricalEventsGroup(chatId) {
-    if (chatId === groupId) {
-        console.log(`Mensagem não enviada para grupo ${chatId}`);
-        return;
-    }
     const events = await getHistoricalEvents();
 
     if (events) {
@@ -126,14 +122,12 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const morningJob = new CronJob(
-    "0 8 * * *",
+    "31 13 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
-            if (chatId !== groupId) {
-                sendHistoricalEventsGroup(chatId);
-            }
+            sendHistoricalEventsGroup(chatId);
         }
     },
     null,
