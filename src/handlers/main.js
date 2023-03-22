@@ -176,16 +176,8 @@ bot.onText(/\/stats/, async (msg) => {
     const numUsers = await UserModel.countDocuments();
     const numChats = await ChatModel.countDocuments();
 
-    // Verifica se o ID do desenvolvedor é igual a um dos IDs armazenados na variável de ambiente
-    if (process.env.DEVELOPER_ID.split(",").includes(msg.from.id.toString())) {
-        const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
-        bot.sendMessage(chatId, message);
-    } else {
-        bot.sendMessage(
-            chatId,
-            "Você não tem permissão para usar este comando."
-        );
-    }
+    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
+    bot.sendMessage(chatId, message);
 });
 
 ChatModel.on("save", (chat) => {
