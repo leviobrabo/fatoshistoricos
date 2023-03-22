@@ -160,7 +160,7 @@ async function sendHistoricalEventsChannel(channelId) {
 }
 
 const dailyJob = new CronJob(
-    "0 5 * * *",
+    "52 12 * * *",
     function () {
         sendHistoricalEventsChannel(channelId);
     },
