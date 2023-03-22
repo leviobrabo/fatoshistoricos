@@ -3,29 +3,24 @@
     "description": "'Fatos Históricos' é um Bot que envia fatos históricos de cada dia do mês",
     "repository": "https://github.com/leviobrabo/fatoshistoricos",
     "logo": "https://i.imgur.com/XXxV74z.jpeg",
-    "keywords": [
-      "node",
-      "fatos_históricos",
-      "telegrambot"
-    ],
+    "keywords": ["node", "fatos_históricos", "telegrambot"],
     "website": "https://github.com/leviobrabo/fatoshistoricos",
     "success_url": "https://t.me/fatoshistbot",
     "env": {
-      "TELEGRAM_API": {
-        "description": "Make a bot at BotFather http://telegram.dog/BotFather and get the token of your bot",
-        "value": "",
-        "required": true
-      },
-      "DB_STRING": {
-        "description": "Create database ate MongoDB Atlas https://www.mongodb.com/ create new cluster and get url for connection.",
-        "value": "",
-        "required": true
-      },
-      "groupId": {
-        "description": "Group ID LOG Telegram.",
-        "value": "",
-        "required": true
-      }
+        "TELEGRAM_API": {
+            "description": "Make a bot at BotFather http://telegram.dog/BotFather and get the token of your bot",
+            "value": "",
+            "required": true
+        },
+        "DB_STRING": {
+            "description": "Create database ate MongoDB Atlas https://www.mongodb.com/ create new cluster and get url for connection.",
+            "value": "",
+            "required": true
+        },
+        "groupId": {
+            "description": "Group ID LOG Telegram.",
+            "value": "",
+            "required": true
+        }
     }
-  }
-
+}
