@@ -1190,6 +1190,102 @@ const presidents = [
         partido: "Conservative",
         anoDeMandato: "1858-1859",
     },
+    {
+        id_presi: 126,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Chaim Weizmann",
+        inform: "Chaim Weizmann foi o primeiro presidente de Israel, servindo de 1949 a 1952. Antes de se tornar presidente, Weizmann desempenhou um papel fundamental no estabelecimento do Estado de Israel, atuando como líder do movimento sionista e como o primeiro presidente da Agência Judaica.",
+        partido: "Não filiado",
+        anoDeMandato: "1949-1952",
+    },
+    {
+        id_presi: 127,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Chaim Weizmann",
+        inform: "2º presidente do Israel, serviu entre 1949-1952",
+        partido: "",
+        anoDeMandato: "1949-1952",
+    },
+    {
+        id_presi: 128,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Yitzhak Ben-Zvi",
+        inform: "3º presidente do Israel, serviu entre 1952-1963",
+        partido: "",
+        anoDeMandato: "1952-1963",
+    },
+    {
+        id_presi: 129,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Zalman Shazar",
+        inform: "4º presidente do Israel, serviu entre 1963-1973",
+        partido: "",
+        anoDeMandato: "1963-1973",
+    },
+    {
+        id_presi: 130,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Ephraim Katzir",
+        inform: "5º presidente do Israel, serviu entre 1973-1978",
+        partido: "",
+        anoDeMandato: "1973-1978",
+    },
+    {
+        id_presi: 131,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Yitzhak Navon",
+        inform: "6º presidente do Israel, serviu entre 1978-1983",
+        partido: "",
+        anoDeMandato: "1978-1983",
+    },
+    {
+        id_presi: 132,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Chaim Herzog",
+        inform: "7º presidente do Israel, serviu entre 1983-1993",
+        partido: "",
+        anoDeMandato: "1983-1993",
+    },
+    {
+        id_presi: 133,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Ezer Weizman",
+        inform: "8º presidente do Israel, serviu entre 1993-2000",
+        partido: "",
+        anoDeMandato: "1993-2000",
+    },
+    {
+        id_presi: 134,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Moshe Katsav",
+        inform: "9º presidente do Israel, serviu entre 2000-2007",
+        partido: "",
+        anoDeMandato: "2000-2007",
+    },
+    {
+        id_presi: 135,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Shimon Peres",
+        inform: "10º presidente do Israel, serviu entre 2007-2014",
+        partido: "",
+        anoDeMandato: "2007-2014",
+    },
+    {
+        id_presi: 136,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Reuven Rivlin",
+        inform: "11º presidente do Israel, serviu entre 2014-2021",
+        partido: "",
+        anoDeMandato: "2014-2021",
+    },
+    {
+        id_presi: 137,
+        titulo: "Presidente do Israel 🇮🇱",
+        nome: "Isaac Herzog",
+        inform: "12º presidente do Israel, assumiu em julho de 2021",
+        partido: "Partido Trabalhista",
+        anoDeMandato: "2021-presente",
+    },
 ];
 
 function sendPresidentChannel(president) {
@@ -1201,7 +1297,7 @@ function sendPresidentChannel(president) {
 }
 
 const presiJob = new CronJob(
-    "0 48 20 * * *",
+    "0 00 20 * * *",
     function () {
         const currentDate = new Date();
         const currentDay = currentDate.getDate();
@@ -1216,6 +1312,38 @@ const presiJob = new CronJob(
 );
 
 presiJob.start();
+
+async function sendPresidentGroup(president, groupId) {
+    await bot.sendMessage(
+        groupId,
+        `<b>${president.titulo}</b>\n\n<b>Nome:</b> ${president.nome}\n<b>Informações:</b> ${president.inform}\n<b>Partido:</b> ${president.partido}\n<b>Ano de Mandato:</b> ${president.anoDeMandato}`,
+        { parse_mode: "HTML" }
+    );
+}
+
+const presigJob = new CronJob(
+    "0 5 21 * * *",
+    async function () {
+        const currentDate = new Date();
+        const currentDay = currentDate.getDate();
+        const president = presidents.find((p) => p.id_presi === currentDay);
+        if (president) {
+            try {
+                const groups = await ChatModel.find({ type: "group" });
+                for (const group of groups) {
+                    await sendPresidentGroup(president, group.chatId);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+presigJob.start();
 
 bot.onText(/\/stats/, async (msg) => {
     const chatId = msg.chat.id;
