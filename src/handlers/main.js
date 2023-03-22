@@ -126,7 +126,7 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const morningJob = new CronJob(
-    "0 8 * * *",
+    "15 13 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
@@ -160,7 +160,7 @@ async function sendHistoricalEventsChannel(channelId) {
 }
 
 const dailyJob = new CronJob(
-    "7 13 * * *",
+    "52 12 * * *",
     function () {
         sendHistoricalEventsChannel(channelId);
     },
@@ -176,6 +176,7 @@ bot.onText(/\/stats/, async (msg) => {
     const numUsers = await UserModel.countDocuments();
     const numChats = await ChatModel.countDocuments();
 
+    // Verifica se o ID do desenvolvedor é igual a um dos IDs armazenados na variável de ambiente
     if (process.env.DEVELOPER_ID.split(",").includes(msg.from.id.toString())) {
         const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
         bot.sendMessage(chatId, message);
