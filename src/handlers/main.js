@@ -126,7 +126,7 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const morningJob = new CronJob(
-    "15 13 * * *",
+    "0 8 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
@@ -146,8 +146,8 @@ morningJob.start();
 const channelId = process.env.channelId;
 
 async function sendHistoricalEventsChannel(channelId) {
-    const events_channel = await getHistoricalEvents();
-    if (events_channel) {
+    const events = await getHistoricalEvents();
+    if (events) {
         const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
         bot.sendMessage(channelId, message, { parse_mode: "HTML" });
     } else {
@@ -160,7 +160,7 @@ async function sendHistoricalEventsChannel(channelId) {
 }
 
 const dailyJob = new CronJob(
-    "52 12 * * *",
+    "18 13 * * *",
     function () {
         sendHistoricalEventsChannel(channelId);
     },
