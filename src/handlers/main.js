@@ -160,7 +160,7 @@ async function sendHistoricalEventsChannel(channelId) {
 }
 
 const dailyJob = new CronJob(
-    "52 12 * * *",
+    "7 13 * * *",
     function () {
         sendHistoricalEventsChannel(channelId);
     },
@@ -172,19 +172,20 @@ const dailyJob = new CronJob(
 dailyJob.start();
 
 bot.onText(/\/stats/, async (msg) => {
-  const chatId = msg.chat.id;
-  const numUsers = await UserModel.countDocuments();
-  const numChats = await ChatModel.countDocuments();
-  
-  // Verifica se o ID do desenvolvedor é igual a um dos IDs armazenados na variável de ambiente
-  if (process.env.DEVELOPER_ID.split(',').includes(msg.from.id.toString())) {
-    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
-    bot.sendMessage(chatId, message);
-  } else {
-    bot.sendMessage(chatId, 'Você não tem permissão para usar este comando.');
-  }
-});
+    const chatId = msg.chat.id;
+    const numUsers = await UserModel.countDocuments();
+    const numChats = await ChatModel.countDocuments();
 
+    if (process.env.DEVELOPER_ID.split(",").includes(msg.from.id.toString())) {
+        const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
+        bot.sendMessage(chatId, message);
+    } else {
+        bot.sendMessage(
+            chatId,
+            "Você não tem permissão para usar este comando."
+        );
+    }
+});
 
 ChatModel.on("save", (chat) => {
     const message = `#Togurosbot #New_Group
