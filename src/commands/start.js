@@ -50,7 +50,7 @@ function startCommand(bot, message) {
                             [
                                 {
                                     text: "Voltar",
-                                    url: "back_to_start",
+                                    callback_data: "back_to_start",
                                 },
                             ],
                         ],
@@ -68,8 +68,6 @@ function startCommand(bot, message) {
 
         bot.sendPhoto(message.chat.id, imageURL, options);
     }
-
-    bot.sendPhoto(message.chat.id, imageURL, options);
 }
 
 module.exports = {
