@@ -53,6 +53,12 @@ function startCommand(bot, message) {
                                 url: "t.me/kylorensbot",
                             },
                         ],
+                        [
+                            {
+                                text: "Voltar",
+                                callback_data: "back_to_start",
+                            },
+                        ],
                     ],
                 },
             });
@@ -65,7 +71,7 @@ function startCommand(bot, message) {
             });
         }
     });
-    bot.sendMessage(message.chat.id, text, options);
+    bot.sendMessage(message.chat.id, welcomeMessage, options);
 }
 
 module.exports = {
