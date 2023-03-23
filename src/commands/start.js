@@ -5,8 +5,7 @@ module.exports = async (msg) => {
         const imageURL = "https://i.imgur.com/MzZuN3G.jpeg";
 
         const firstName = message.from.first_name;
-        const message =
-            "Olá, *${firstName}*, eu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)";
+        const message = `Olá, *${firstName}*, eu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)`;
 
         const buttons = [
             [
