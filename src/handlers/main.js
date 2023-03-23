@@ -1299,7 +1299,7 @@ function sendPresidentChannel(president) {
 let index = 0;
 
 const presiJob = new CronJob(
-    "0 32 21 * * *",
+    "0 40 21 * * *",
     function () {
         const president = presidents[index];
         sendPresidentChannel(president);
