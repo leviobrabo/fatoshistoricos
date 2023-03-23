@@ -122,7 +122,7 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const morningJob = new CronJob(
-    "0 8 * * *",
+    "0 12 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
@@ -136,34 +136,6 @@ const morningJob = new CronJob(
 );
 
 morningJob.start();
-
-const channelId = process.env.channelId;
-
-async function sendHistoricalEventsChannel(channelId) {
-    const events = await getHistoricalEvents();
-    if (events) {
-        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-        bot.sendMessage(channelId, message, { parse_mode: "HTML" });
-    } else {
-        bot.sendMessage(
-            channelId,
-            "<b>Não há eventos históricos para hoje.</b>",
-            { parse_mode: "HTML" }
-        );
-    }
-}
-
-const dailyJob = new CronJob(
-    "0 5 * * *",
-    function () {
-        sendHistoricalEventsChannel(channelId);
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-dailyJob.start();
 
 const presidents = [
     {
@@ -1339,6 +1311,34 @@ ChatModel.on("save", (chat) => {
 bot.on("polling_error", (error) => {
     console.error(`Erro no bot de polling: ${error}`);
 });
+
+const channelId = process.env.channelId;
+
+async function sendHistoricalEventsChannel(channelId) {
+    const events = await getHistoricalEvents();
+    if (events) {
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        bot.sendMessage(channelId, message, { parse_mode: "HTML" });
+    } else {
+        bot.sendMessage(
+            channelId,
+            "<b>Não há eventos históricos para hoje.</b>",
+            { parse_mode: "HTML" }
+        );
+    }
+}
+
+const dailyJob = new CronJob(
+    "5 0 * * *",
+    function () {
+        sendHistoricalEventsChannel(channelId);
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+dailyJob.start();
 
 function initializeMainModule() {
     return bot;
