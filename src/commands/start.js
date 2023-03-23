@@ -25,7 +25,7 @@ function startCommand(bot, message) {
             ],
         },
     };
-    bot.on("callback_query", async (callbackQuery) => {
+    bot.on("callback_query", (callbackQuery) => {
         if (callbackQuery.message.chat.type !== "private") {
             return;
         }
@@ -40,7 +40,7 @@ function startCommand(bot, message) {
 
             const resposta = `Olá, ${usuario}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: \`${chavePix}\` \nBanco: ${banco}\nNome: ${nome}\n\nObrigado pela sua contribuição! 🙌"`;
 
-            await bot.editMessageText(resposta, {
+            bot.editMessageText(resposta, {
                 chat_id: chatId,
                 message_id: messageId,
                 parse_mode: "Markdown",
@@ -60,7 +60,7 @@ function startCommand(bot, message) {
                 },
             });
         } else if (callbackQuery.data === "back_to_start") {
-            await bot.editMessageText(welcomeMessage, {
+            bot.editMessageText(welcomeMessage, {
                 parse_mode: "Markdown",
                 chat_id: chatId,
                 message_id: messageId,
