@@ -1288,6 +1288,10 @@ const presidents = [
     },
 ];
 
+presidents.sort((a, b) => a.id_presi - b.id_presi);
+
+let lastSentIndex = -1;
+
 function sendPresidentChannel(president) {
     bot.sendMessage(
         channelId,
@@ -1297,14 +1301,14 @@ function sendPresidentChannel(president) {
 }
 
 const presiJob = new CronJob(
-    "0 00 20 * * *",
+    "0 22 21 * * *",
     function () {
-        const currentDate = new Date();
-        const currentDay = currentDate.getDate();
-        const president = presidents.find((p) => p.id_presi === currentDay);
-        if (president) {
-            sendPresidentChannel(president);
+        lastSentIndex++;
+        if (lastSentIndex >= presidents.length) {
+            lastSentIndex = 0;
         }
+        const president = presidents[lastSentIndex];
+        sendPresidentChannel(president);
     },
     null,
     true,
