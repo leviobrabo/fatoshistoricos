@@ -122,7 +122,7 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const morningJob = new CronJob(
-    "40 8 * * *",
+    "0 12 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
@@ -1329,7 +1329,7 @@ async function sendHistoricalEventsChannel(channelId) {
 }
 
 const dailyJob = new CronJob(
-    "5 0 * * *",
+    "0 5 * * *",
     function () {
         sendHistoricalEventsChannel(channelId);
     },
