@@ -5,7 +5,7 @@ function startCommand(bot, message) {
 
     const firstName = message.from.first_name;
 
-    const welcomeMessage = `Olá, *${firstName}*, eu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)`;
+    const welcomeMessage = `Olá, *${firstName}*!\n\nEu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)`;
     const options = {
         parse_mode: "Markdown",
         disable_web_page_preview: true,
@@ -25,7 +25,6 @@ function startCommand(bot, message) {
             ],
         },
     };
-
     bot.on("callback_query", async (callbackQuery) => {
         if (callbackQuery.message.chat.type !== "private") {
             return;
@@ -52,8 +51,6 @@ function startCommand(bot, message) {
                                 text: "Suporte",
                                 url: "t.me/kylorensbot",
                             },
-                        ],
-                        [
                             {
                                 text: "Voltar",
                                 callback_data: "back_to_start",
