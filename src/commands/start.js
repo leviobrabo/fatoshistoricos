@@ -56,13 +56,6 @@ function startCommand(bot, message) {
                         ],
                     },
                 });
-            } else if (callbackQuery.data === "back_to_start") {
-                await bot.editMessageText(welcomeMessage, {
-                    parse_mode: "Markdown",
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: options.reply_markup,
-                });
             }
         });
 
