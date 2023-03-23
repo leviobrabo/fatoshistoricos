@@ -21,6 +21,11 @@
             "description": "Group ID LOG Telegram.",
             "value": "",
             "required": true
+        },
+       "channelId": {
+            "description": "Channel ID post Telegram.",
+            "value": "",
+            "required": true
         }
     }
 }
