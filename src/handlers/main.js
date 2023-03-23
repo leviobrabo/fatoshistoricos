@@ -1313,38 +1313,6 @@ const presiJob = new CronJob(
 
 presiJob.start();
 
-async function sendPresidentGroup(president, groupId) {
-    await bot.sendMessage(
-        groupId,
-        `<b>${president.titulo}</b>\n\n<b>Nome:</b> ${president.nome}\n<b>Informações:</b> ${president.inform}\n<b>Partido:</b> ${president.partido}\n<b>Ano de Mandato:</b> ${president.anoDeMandato}`,
-        { parse_mode: "HTML" }
-    );
-}
-
-const presigJob = new CronJob(
-    "0 5 21 * * *",
-    async function () {
-        const currentDate = new Date();
-        const currentDay = currentDate.getDate();
-        const president = presidents.find((p) => p.id_presi === currentDay);
-        if (president) {
-            try {
-                const groups = await ChatModel.find({ type: "group" });
-                for (const group of groups) {
-                    await sendPresidentGroup(president, group.chatId);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-presigJob.start();
-
 bot.onText(/\/stats/, async (msg) => {
     const chatId = msg.chat.id;
     const numUsers = await UserModel.countDocuments();
