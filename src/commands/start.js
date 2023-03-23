@@ -7,7 +7,7 @@ module.exports = async (msg) => {
 
         // Mensagem
         const message =
-            "Olá, sou fatos históricos! \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.";
+            "Olá, sou fatos históricos! \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)";
 
         // Botões conectados à imagem
         const buttons = [
