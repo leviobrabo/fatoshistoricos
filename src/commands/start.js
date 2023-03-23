@@ -21,7 +21,6 @@ module.exports = async (msg) => {
             [{ text: "Fazer uma doação 💰", callback_data: "/donate" }],
         ];
 
-        // Enviando a mensagem com a imagem e os botões
         await bot.sendPhoto(msg.chat.id, imageURL, {
             caption: message,
             disable_web_page_preview: true,
