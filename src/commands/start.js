@@ -49,8 +49,8 @@ function startCommand(bot, message) {
                         inline_keyboard: [
                             [
                                 {
-                                    text: "Voltar",
-                                    callback_data: "back_to_start",
+                                    text: "Suporte",
+                                    url: "t.me/kylorensbot",
                                 },
                             ],
                         ],
