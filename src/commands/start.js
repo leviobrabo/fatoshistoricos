@@ -63,10 +63,11 @@ function startCommand(bot, message) {
                 },
             });
         } else if (callbackQuery.data === "back_to_start") {
-            await bot.editMessageText(text, {
-                parse_mode: "HTML",
+            await bot.editMessageText(welcomeMessage, {
+                parse_mode: "Markdown",
                 chat_id: chatId,
                 message_id: messageId,
+                disable_web_page_preview: true,
                 reply_markup: options.reply_markup,
             });
         }
