@@ -7,7 +7,7 @@ bot.on("callback_query", async (callbackQuery) => {
     const msg = callbackQuery.message;
     const data = callbackQuery.data;
 
-    if (data === "donate") {
+    if (callbackQuery.data === "donate") {
         const usuario = msg.from.first_name;
         const chavePix = "32dc79d2-2868-4ef0-a277-2c10725341d4";
         const banco = "Picpay";
