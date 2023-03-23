@@ -10,8 +10,8 @@ const { startCommand } = require("./commands/start");
 const { histimag } = require("./commands/histimag");
 const { helpCommand } = require("./commands/help");
 
-bot.onText(/^\/start/, async (message) => {
-    await startCommand(bot, message);
+bot.onText(/^\/start/, (message) => {
+    startCommand(bot, message);
 });
 
 bot.onText(/^\/fotoshist/, async (message) => {
