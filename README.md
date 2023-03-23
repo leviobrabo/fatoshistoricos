@@ -36,6 +36,8 @@ $ npm i
 # Crie um arquivo com .env com qualquer editor de texto e coloque:
 DB_STRING=#URL de conexão com o MongoDB
 TELEGRAM_API=Token do seu bot gerado no @BotFather
+groupId=ID GROUP LOG
+channelId=ID CHANNEL POST
 
 # Execute a aplicação
 $ npm start
