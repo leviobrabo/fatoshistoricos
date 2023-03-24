@@ -4,7 +4,7 @@ function helpCommand(bot, message) {
     }
 
     const text =
-        "Olá! Eu sou um bot programado para enviar fatos históricos todos os dias nos horários pré-determinados de 8h, 15h e 22h. \n\nAlém disso, tenho comandos incríveis que podem ser úteis para você. Fique à vontade para interagir comigo e descobrir mais sobre o mundo que nos cerca! \n\n<b>Basta clicar em um deles:</b>";
+        "Olá! Eu sou um bot programado para enviar fatos históricos todos os dias nos horários pré-determinados de 8h. \n\nAlém disso, tenho comandos incríveis que podem ser úteis para você. Fique à vontade para interagir comigo e descobrir mais sobre o mundo que nos cerca! \n\n<b>Basta clicar em um deles:</b>";
     const options = {
         parse_mode: "HTML",
         reply_markup: {
