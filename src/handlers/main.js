@@ -5,9 +5,9 @@ const CronJob = require("cron").CronJob;
 const { ChatModel } = require("../database");
 const { UserModel } = require("../database");
 
-const startCommand = require("./commands/start");
-const { histimag } = require("./commands/histimag");
-const { helpCommand } = require("./commands/help");
+const startCommand = require("../commands/start");
+const { histimag } = require("../commands/histimag");
+const { helpCommand } = require("../commands/help");
 
 const groupId = process.env.groupId;
 
