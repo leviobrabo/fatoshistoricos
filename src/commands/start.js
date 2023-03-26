@@ -1,28 +1,26 @@
-const { bot } = require("../bot");
-
-module.exports = async (msg) => {
-    if (msg.chat.type === "private") {
+function startCommand(bot, message) {
+    if (message.chat.type === "private") {
         const imageURL = "https://i.imgur.com/MzZuN3G.jpeg";
 
-        const firstName = msg.from.first_name;
-        const message = `Olá, *${firstName}*, eu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)`;
+        const firstName = message.from.first_name;
+        const message_start = `Olá, *${firstName}*, eu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)`;
 
         const buttons = [
             [
                 {
                     text: "Adicione-me em seu grupo",
-                    url: "https://t.me/climatologiabot?startgroup=true",
+                    url: "https://t.me/fatoshistbot?startgroup=true",
                 },
             ],
             [
                 { text: "👾 Canal", url: "https://t.me/lbrabo" },
                 { text: "🪪 Dono", url: "https://t.me/Kylorensbot" },
             ],
-            [{ text: "Fazer uma doação 💰", callback_data: "/donate" }],
+            [{ text: "Fazer uma doação 💰", callback_data: "donate" }],
         ];
 
-        await bot.sendPhoto(msg.chat.id, imageURL, {
-            caption: message,
+        bot.sendPhoto(message.chat.id, imageURL, {
+            caption: message_start,
             disable_web_page_preview: true,
             parse_mode: "Markdown",
             reply_markup: {
@@ -30,26 +28,37 @@ module.exports = async (msg) => {
             },
         });
     }
-};
-
+}
 bot.on("callback_query", async (callbackQuery) => {
     if (callbackQuery.message.chat.type !== "private") {
         return;
     }
-    const msg = callbackQuery.message;
+    const message = callbackQuery.message;
     const data = callbackQuery.data;
 
-    if (data === "/donate") {
-        const usuario = msg.from.first_name;
+    if (callbackQuery.data === "donate") {
+        const usuario = message.from.first_name;
         const chavePix = "32dc79d2-2868-4ef0-a277-2c10725341d4";
         const banco = "Picpay";
         const nome = "Luzia";
 
         const resposta = `Olá, ${usuario}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: \`\`\`${chavePix}\`\`\` \nBanco: ${banco}\nNome: ${nome}\n\nObrigado pela sua contribuição! 🙌"`;
 
-        bot.sendMessage(msg.chat.id, resposta, {
-            reply_to_message_id: msg.message_id,
+        bot.editMessageText(message.chat.id, resposta, {
+            reply_to_message_id: message.message_id,
+            parse_mode: "Markdown",
+        });
+    } else if (callbackQuery.data === "back_to_start") {
+        const imageURL = "https://i.imgur.com/12345.jpeg";
+        const caption =
+            "Bem-vindo de volta! Aqui está outra imagem interessante:";
+        await bot.sendPhoto(message.chat.id, imageURL, {
+            caption: caption,
+            disable_web_page_preview: true,
             parse_mode: "Markdown",
         });
     }
 });
+module.exports = {
+    startCommand,
+};
