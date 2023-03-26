@@ -39,7 +39,7 @@ function startCommand(bot, message) {
         if (callbackQuery.data === "donate") {
             const resposta_donate = `Olá, ${firstName}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: <code>32dc79d2-2868-4ef0-a277-2c10725341d4</code>\nBanco: Picpay\nNome: Luzia\n\nObrigado pela sua contribuição! 🙌`;
 
-            await bot.editMessageText(message.chat.id, resposta_donate, {
+            await bot.editMessageText(resposta_donate, {
                 parse_mode: "HTML",
                 disable_web_page_preview: true,
                 chat_id: chatId,
