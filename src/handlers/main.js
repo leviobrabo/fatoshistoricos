@@ -193,7 +193,7 @@ const channelJob = new CronJob(
 
 channelJob.start();
 
-bot.onText(/^\/start/, (message) => {
+bot.onText(/^\/start$/, (message) => {
     startCommand(bot, message);
 });
 
