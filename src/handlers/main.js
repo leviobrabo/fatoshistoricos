@@ -11,6 +11,18 @@ const { helpCommand } = require("../commands/help");
 
 const groupId = process.env.groupId;
 
+bot.onText(/^\/start$/, (message) => {
+    startCommand(bot, message);
+});
+
+bot.onText(/^\/fotoshist/, async (message) => {
+    await histimag(bot, message);
+});
+
+bot.onText(/^\/help/, (message) => {
+    helpCommand(bot, message);
+});
+
 bot.on("message", async (msg) => {
     try {
         if (
@@ -192,18 +204,6 @@ const channelJob = new CronJob(
 );
 
 channelJob.start();
-
-bot.onText(/^\/start$/, (message) => {
-    startCommand(bot, message);
-});
-
-bot.onText(/^\/fotoshist/, async (message) => {
-    await histimag(bot, message);
-});
-
-bot.onText(/^\/help/, (message) => {
-    helpCommand(bot, message);
-});
 
 exports.initHandler = () => {
     return bot;
