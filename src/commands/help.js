@@ -44,14 +44,14 @@ function helpCommand(bot, message) {
                             [
                                 {
                                     text: "Voltar",
-                                    callback_data: "back_to_start",
+                                    callback_data: "back_to_help",
                                 },
                             ],
                         ],
                     },
                 }
             );
-        } else if (callbackQuery.data === "back_to_start") {
+        } else if (callbackQuery.data === "back_to_help") {
             await bot.editMessageText(text, {
                 parse_mode: "HTML",
                 chat_id: chatId,

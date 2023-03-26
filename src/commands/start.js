@@ -18,9 +18,8 @@ function startCommand(bot, message) {
                 ],
                 [
                     { text: "👾 Canal", url: "https://t.me/lbrabo" },
-                    { text: "🪪 Dono", url: "https://t.me/Kylorensbot" },
+                    { text: "Fazer uma doação 💰", callback_data: "donate" },
                 ],
-                [{ text: "Fazer uma doação 💰", callback_data: "donate" }],
             ],
         },
     };
