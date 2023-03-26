@@ -1,5 +1,5 @@
 function startCommand(bot, message) {
-    if (message.chat.type === "private") {
+    if (message.chat.type !== "private") {
         return;
     }
     const firstName = message.from.first_name;
@@ -17,8 +17,14 @@ function startCommand(bot, message) {
                     },
                 ],
                 [
-                    { text: "👾 Canal", url: "https://t.me/lbrabo" },
-                    { text: "Fazer uma doação 💰", callback_data: "donate" },
+                    {
+                        text: "👾 Canal",
+                        url: "https://t.me/lbrabo",
+                    },
+                    {
+                        text: "Fazer uma doação 💰",
+                        callback_data: "donate",
+                    },
                 ],
             ],
         },
