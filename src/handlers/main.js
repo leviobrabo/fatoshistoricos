@@ -138,7 +138,7 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const manhaJob = new CronJob(
-    "0 18 * * *",
+    "0 8 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
