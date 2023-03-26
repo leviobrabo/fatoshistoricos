@@ -33,8 +33,8 @@ bot.on("callback_query", async (callbackQuery) => {
     if (callbackQuery.message.chat.type !== "private") {
         return;
     }
-    const message = callbackQuery.message;
-    const data = callbackQuery.data;
+    const chatId = callbackQuery.message.chat.id;
+    const messageId = callbackQuery.message.message_id;
 
     if (callbackQuery.data === "donate") {
         const usuario = message.from.first_name;
@@ -45,8 +45,20 @@ bot.on("callback_query", async (callbackQuery) => {
         const resposta = `Olá, ${usuario}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: \`\`\`${chavePix}\`\`\` \nBanco: ${banco}\nNome: ${nome}\n\nObrigado pela sua contribuição! 🙌"`;
 
         bot.editMessageText(message.chat.id, resposta, {
-            reply_to_message_id: message.message_id,
             parse_mode: "Markdown",
+            disable_web_page_preview: true,
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "Voltar",
+                            callback_data: "back_to_start",
+                        },
+                    ],
+                ],
+            },
         });
     } else if (callbackQuery.data === "back_to_start") {
         const imageURL = "https://i.imgur.com/12345.jpeg";
@@ -56,6 +68,7 @@ bot.on("callback_query", async (callbackQuery) => {
             caption: caption,
             disable_web_page_preview: true,
             parse_mode: "Markdown",
+            reply_markup: buttons.reply_markup,
         });
     }
 });
