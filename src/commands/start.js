@@ -4,9 +4,9 @@ function startCommand(bot, message) {
     }
     const firstName = message.from.first_name;
 
-    const message_start = `Olá, *${firstName}*, eu sou *Fatos Históricos!* \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦*Meu código-fonte:* [GitHub](https://github.com/leviobrabo/climatologiabot)`;
+    const message_start = `Olá, <b>${firstName}</b>, eu sou <b>Fatos Históricos!</b> \n\nSou um bot que envia diáriamente mensagem com fatos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
     const options_start = {
-        parse_mode: "Markdown",
+        parse_mode: "HTML",
         disable_web_page_preview: true,
         reply_markup: {
             inline_keyboard: [
@@ -32,15 +32,14 @@ function startCommand(bot, message) {
         const messageId = callbackQuery.message.message_id;
 
         if (callbackQuery.data === "donate") {
-            const usuario = message.from.first_name;
             const chavePix = "32dc79d2-2868-4ef0-a277-2c10725341d4";
             const banco = "Picpay";
             const nome = "Luzia";
 
-            const resposta = `Olá, ${usuario}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: \`\`\`${chavePix}\`\`\` \nBanco: ${banco}\nNome: ${nome}\n\nObrigado pela sua contribuição! 🙌`;
+            const resposta = `Olá, ${firstName}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: <code>${chavePix}</code>\nBanco: ${banco}\nNome: ${nome}\n\nObrigado pela sua contribuição! 🙌`;
 
             await bot.editMessageText(message.chat.id, resposta, {
-                parse_mode: "Markdown",
+                parse_mode: "HTML",
                 disable_web_page_preview: true,
                 chat_id: chatId,
                 message_id: messageId,
@@ -57,7 +56,7 @@ function startCommand(bot, message) {
             });
         } else if (callbackQuery.data === "back_to_start") {
             await bot.editMessageText(message_start, {
-                parse_mode: "Markdown",
+                parse_mode: "HTML",
                 chat_id: chatId,
                 message_id: messageId,
                 disable_web_page_preview: true,
