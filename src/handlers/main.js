@@ -5,7 +5,7 @@ const CronJob = require("cron").CronJob;
 const { ChatModel } = require("../database");
 const { UserModel } = require("../database");
 
-const startCommand = require("../commands/start");
+const { startCommand } = require("../commands/start");
 const { histimag } = require("../commands/histimag");
 const { helpCommand } = require("../commands/help");
 
@@ -193,7 +193,9 @@ const channelJob = new CronJob(
 
 channelJob.start();
 
-bot.onText(/^\/start/, startCommand);
+bot.onText(/^\/start/, (message) => {
+    startCommand(bot, message);
+});
 
 bot.onText(/^\/fotoshist/, async (message) => {
     await histimag(bot, message);
