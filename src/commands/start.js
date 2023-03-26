@@ -57,7 +57,7 @@ function startCommand(bot, message) {
             });
         } else if (callbackQuery.data === "back_to_start") {
             await bot.editMessageText(message_start, {
-                parse_mode: "HTML",
+                parse_mode: "Markdown",
                 chat_id: chatId,
                 message_id: messageId,
                 disable_web_page_preview: true,
@@ -67,6 +67,7 @@ function startCommand(bot, message) {
     });
     bot.sendMessage(message.chat.id, message_start, options_start);
 }
+
 module.exports = {
     startCommand,
 };
