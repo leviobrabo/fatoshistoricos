@@ -107,7 +107,23 @@ bot.on("new_chat_members", async (msg) => {
         if (newMembers.length > 0) {
             bot.sendMessage(
                 chatId,
-                "Olá, eu sou um bot e estou feliz em estar aqui com vocês!"
+                "Olá, meu nome é Fatos Históricos! Obrigado por me adicionado em seu grupo.\n\nEu enviarei mensagem todos os dias às 8 horas e possuo alguns comandos.",
+                {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                {
+                                    text: "Visite nosso canal",
+                                    url: "https://t.me/pjtlbrabo",
+                                },
+                                {
+                                    text: "Relate bugs",
+                                    url: "https://t.me/kylorensbot",
+                                },
+                            ],
+                        ],
+                    },
+                }
             );
         }
     } catch (err) {
