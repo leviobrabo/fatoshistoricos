@@ -76,10 +76,9 @@ bot.on("new_chat_members", async (msg) => {
     const chatName = msg.chat.title;
 
     const botId = await bot.telegram.getMe().then((botInfo) => botInfo.id);
-    const newMembers = msg.new_chat_members.filter(
-        (member) => member.id === botId
-    );
-    if (newMembers.length === 0) return;
+    if (!msg.new_chat_members.some((member) => member.id === botId)) {
+        return;
+    }
 
     try {
         const existingChat = await ChatModel.findOne({ chatId });
@@ -96,10 +95,8 @@ bot.on("new_chat_members", async (msg) => {
             `Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`
         );
 
-        await bot.telegram.sendMessage(
-            chatId,
-            "Obrigado por me adicionar ao grupo!"
-        );
+        const greeting = `Olá, pessoal! Obrigado por me adicionar ao grupo ${chatName}! Estou ansioso para interagir com vocês.`;
+        bot.sendMessage(chatId, greeting);
     } catch (err) {
         console.error(err);
     }
