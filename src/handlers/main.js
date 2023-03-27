@@ -89,6 +89,13 @@ bot.on("new_chat_members", async (msg) => {
         console.log(
             `Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`
         );
+        const botId = await bot.telegram.getMe().then((botInfo) => botInfo.id);
+        if (msg.new_chat_members.some((member) => member.id === botId)) {
+            await bot.telegram.sendMessage(
+                chatId,
+                "Olá! Obrigado por me adicionar ao grupo. Estou à disposição para ajudar com o que precisar!"
+            );
+        }
     } catch (err) {
         console.error(err);
     }
@@ -106,14 +113,6 @@ bot.on("left_chat_member", async (msg) => {
         console.error(err);
     }
 });
-
-const botId = await bot.telegram.getMe().then((botInfo) => botInfo.id);
-if (msg.new_chat_members.some((member) => member.id === botId)) {
-    await bot.telegram.sendMessage(
-        chatId,
-        "Olá! Obrigado por me adicionar ao grupo. Estou à disposição para ajudar com o que precisar!"
-    );
-}
 
 let day, month;
 
