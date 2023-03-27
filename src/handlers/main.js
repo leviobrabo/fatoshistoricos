@@ -99,6 +99,17 @@ bot.on("new_chat_members", async (msg) => {
                 );
             }
         );
+        const botUser = await bot.getMe();
+        const newMembers = msg.new_chat_members.filter(
+            (member) => member.id === botUser.id
+        );
+
+        if (newMembers.length > 0) {
+            bot.sendMessage(
+                chatId,
+                "Olá, eu sou um bot e estou feliz em estar aqui com vocês!"
+            );
+        }
     } catch (err) {
         console.error(err);
     }
