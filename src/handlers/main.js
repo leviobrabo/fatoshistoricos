@@ -107,6 +107,14 @@ bot.on("left_chat_member", async (msg) => {
     }
 });
 
+const botId = await bot.telegram.getMe().then((botInfo) => botInfo.id);
+if (msg.new_chat_members.some((member) => member.id === botId)) {
+    await bot.telegram.sendMessage(
+        chatId,
+        "Olá! Obrigado por me adicionar ao grupo. Estou à disposição para ajudar com o que precisar!"
+    );
+}
+
 let day, month;
 
 async function getHistoricalEvents() {
