@@ -89,9 +89,12 @@ bot.on("new_chat_members", async (msg) => {
         console.log(
             `Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`
         );
-        const botId = await bot.telegram.getMe().then((botInfo) => botInfo.id);
+
+        const botInfo = await bot.getMe();
+        const botId = botInfo.id;
+
         if (msg.new_chat_members.some((member) => member.id === botId)) {
-            await bot.telegram.sendMessage(
+            await bot.sendMessage(
                 chatId,
                 "Olá! Obrigado por me adicionar ao grupo. Estou à disposição para ajudar com o que precisar!"
             );
@@ -170,7 +173,7 @@ bot.onText(/\/stats/, async (msg) => {
 });
 
 ChatModel.on("save", (chat) => {
-    const message = `#Togurosbot #New_Group
+    const message = `#Fatoshistbot #New_Group
   <b>Group:</b> <a href="tg://resolve?domain=${chat.chatName}&amp;id=${chat.chatId}">${chat.chatName}</a>
   <b>ID:</b> <code>${chat.chatId}</code>`;
     bot.sendMessage(groupId, message, { parse_mode: "HTML" }).catch((error) => {
