@@ -71,14 +71,28 @@ bot.on("polling_error", (error) => {
     console.error(error);
 });
 
+function sendThanksMessage(chatId) {
+    bot.sendMessage(
+        chatId,
+        "Obrigado por me adicionar ao grupo! Clique no botão abaixo para mais informações:",
+        {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "Sobre o bot",
+                            url: "https://seu-site.com/sobre-o-bot",
+                        },
+                    ],
+                ],
+            },
+        }
+    );
+}
+
 bot.on("new_chat_members", async (msg) => {
     const chatId = msg.chat.id;
     const chatName = msg.chat.title;
-
-    const botId = await bot.telegram.getMe().then((botInfo) => botInfo.id);
-    if (!msg.new_chat_members.some((member) => member.id === botId)) {
-        return;
-    }
 
     try {
         const existingChat = await ChatModel.findOne({ chatId });
@@ -94,9 +108,9 @@ bot.on("new_chat_members", async (msg) => {
         console.log(
             `Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`
         );
-
-        const greeting = `Olá, pessoal! Obrigado por me adicionar ao grupo ${chatName}! Estou ansioso para interagir com vocês.`;
-        bot.sendMessage(chatId, greeting);
+        if (msg.new_chat_members.some((member) => member.id === bot.botId)) {
+            sendThanksMessage(msg.chat.id);
+        }
     } catch (err) {
         console.error(err);
     }
