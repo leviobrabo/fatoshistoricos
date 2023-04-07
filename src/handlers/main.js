@@ -180,7 +180,9 @@ const manhaJob = new CronJob(
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
-            sendHistoricalEventsGroup(chatId);
+            if (chatId !== groupId) {
+                sendHistoricalEventsGroup(chatId);
+            }
         }
     },
     null,
