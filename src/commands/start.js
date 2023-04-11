@@ -12,7 +12,7 @@ function startCommand(bot, message) {
             inline_keyboard: [
                 [
                     {
-                        text: "Adicione-me em seu grupo",
+                        text: "✨ Adicione-me em seu grupo",
                         url: "https://t.me/fatoshistbot?startgroup=true",
                     },
                 ],
@@ -22,7 +22,7 @@ function startCommand(bot, message) {
                         url: "https://t.me/lbrabo",
                     },
                     {
-                        text: "Fazer uma doação 💰",
+                        text: "💰 Fazer uma doação",
                         callback_data: "donate",
                     },
                 ],
