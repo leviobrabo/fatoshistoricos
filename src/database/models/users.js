@@ -7,6 +7,7 @@ const userSchema = new Schema({
     lastname: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+    is_dev: { type: Boolean, required: true, default: false },
 });
 
 module.exports = userSchema;
