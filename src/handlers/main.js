@@ -16,11 +16,11 @@ function is_dev(user_id) {
     return devUsers.includes(user_id.toString());
 }
 bot.onText(/^\/start$/, (message) => {
-    devCommand(bot, message);
+    startCommand(bot, message);
 });
 
 bot.onText(/^\/dev$/, (message) => {
-    startCommand(bot, message);
+    devCommand(bot, message);
 });
 
 bot.onText(/^\/fotoshist/, async (message) => {
