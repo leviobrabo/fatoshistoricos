@@ -29,12 +29,9 @@ bot.onText(/^\/help/, (message) => {
 bot.on("message", async (msg) => {
     try {
         if (
-            (msg.chat.type === "private" &&
-                msg.entities &&
-                msg.entities[0].type === "bot_command") ||
-            ((msg.chat.type === "group" || msg.chat.type === "supergroup") &&
-                msg.entities &&
-                msg.entities[0].type === "bot_command")
+            msg.chat.type === "private" &&
+            msg.entities &&
+            msg.entities[0].type === "bot_command"
         ) {
             const existingUser = await UserModel.findOne({
                 user_id: msg.from.id,
