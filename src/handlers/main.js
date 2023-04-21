@@ -89,9 +89,11 @@ bot.on("new_chat_members", async (msg) => {
         console.log(
             `Grupo ${chat.chatName} (${chat.chatId}) adicionado ao banco de dados`
         );
+
         const message = `#Fatoshistbot #New_Group
-    <b>Group:</b> <a href="tg://resolve?domain=${chat.chatName}&amp;id=${chat.chatId}">${chat.chatName}</a>
-    <b>ID:</b> <code>${chat.chatId}</code>`;
+        <b>Group:</b> <a href="tg://resolve?domain=${chat.chatName}&amp;id=${chat.chatId}">${chat.chatName}</a>
+        <b>ID:</b> <code>${chat.chatId}</code>`;
+
         bot.sendMessage(groupId, message, { parse_mode: "HTML" }).catch(
             (error) => {
                 console.error(
@@ -99,6 +101,7 @@ bot.on("new_chat_members", async (msg) => {
                 );
             }
         );
+
         const botUser = await bot.getMe();
         const newMembers = msg.new_chat_members.filter(
             (member) => member.id === botUser.id
