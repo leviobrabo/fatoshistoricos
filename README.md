@@ -1,4 +1,5 @@
-# Fatos Históricos 
+# Fatos Históricos
+
 ## Bot que envia fatos históricos do dia
 
 [![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
@@ -9,9 +10,9 @@
 
 Você vai precisar ter instalado em sua máquina as seguintes ferramentas:
 
-- [Git](https://git-scm.com)
-- [Node.js](https://nodejs.org/en/)
-- [MongoDB](https://cloud.mongodb.com/)
+-   [Git](https://git-scm.com)
+-   [Node.js](https://nodejs.org/en/)
+-   [MongoDB](https://cloud.mongodb.com/)
 
 ### 🤖 Deploy no Heroku
 
@@ -35,9 +36,10 @@ $ npm i
 
 # Crie um arquivo com .env com qualquer editor de texto e coloque:
 DB_STRING=#URL de conexão com o MongoDB
-TELEGRAM_API=Token do seu bot gerado no @BotFather
-groupId=ID GROUP LOG
-channelId=ID CHANNEL POST
+TELEGRAM_API=#Token do seu bot gerado no @BotFather
+groupId=#ID GROUP LOG
+channelId=#ID CHANNEL POST
+DEV_USERS=#ID_DEV // userId1,userId2,userId3
 
 # Execute a aplicação
 $ npm start
