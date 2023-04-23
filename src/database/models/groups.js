@@ -10,6 +10,11 @@ const ChatSchema = new Schema({
         type: String,
         required: false,
     },
+    isBlocked: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
 });
 
 module.exports = ChatSchema;

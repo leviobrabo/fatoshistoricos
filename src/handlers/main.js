@@ -197,7 +197,7 @@ async function sendHistoricalEventsGroup(chatId) {
 const manhaJob = new CronJob(
     "0 8 * * *",
     async function () {
-        const chatModels = await ChatModel.find({});
+        const chatModels = await ChatModel.find({ isBlocked: false });
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
@@ -382,6 +382,7 @@ bot.onText(/\/dev/, async (message) => {
                 "/stats - Estatística de grupos, usuarios e mensagens enviadas",
                 "/broadcast ou /bc - envia mensagem para todos usuários",
                 "/ping - veja a latência da VPS",
+                "/block - bloqueia um chat de receber a mensagem",
             ];
             await bot.editMessageText(
                 "<b>Lista de Comandos:</b> \n\n" + commands.join("\n"),
@@ -416,5 +417,47 @@ bot.onText(/\/dev/, async (message) => {
         bot.sendMessage(userId, message_start_dev, options_start_dev);
     } else {
         bot.sendMessage(message.chat.id, "Você não é desenvolvedor");
+    }
+});
+
+bot.onText(/\/block (.+)/, async (msg, match) => {
+    const chatId = msg.chat.id;
+
+    if (msg.chat.type !== "private") {
+        return bot.sendMessage(
+            chatId,
+            "Este comando só pode ser usado em um chat privado."
+        );
+    }
+
+    if (!is_dev(msg.from.id)) {
+        return bot.sendMessage(
+            chatId,
+            "Você não está autorizado a executar este comando."
+        );
+    }
+
+    const chatIdToBlock = match[1];
+
+    if (!chatIdToBlock) {
+        return bot.sendMessage(
+            chatId,
+            "Por favor, forneça o ID do chat que deseja bloquear."
+        );
+    }
+
+    try {
+        const chatModel = await ChatModel.findOne({ chatId: chatIdToBlock });
+        if (!chatModel) {
+            return bot.sendMessage(chatId, "Chat não encontrado.");
+        }
+
+        chatModel.isBlocked = true;
+        await chatModel.save();
+
+        bot.sendMessage(chatId, `Chat ${chatIdToBlock} bloqueado com sucesso.`);
+    } catch (error) {
+        console.log(error);
+        bot.sendMessage(chatId, "Ocorreu um erro ao bloquear o chat.");
     }
 });
