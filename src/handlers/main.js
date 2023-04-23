@@ -462,6 +462,8 @@ bot.onText(/\/block (.+)/, async (msg, match) => {
     }
 });
 
+const channelStatusId = process.env.channelStatusId;
+
 async function sendStatus() {
     const start = new Date();
     const replied = await bot.sendMessage(channelStatusId, "Bot is ON");
@@ -492,7 +494,7 @@ function timeFormatter(seconds) {
 }
 
 const job = new CronJob(
-    "40 11 * * *",
+    "37 11 * * *",
     sendStatus,
     null,
     true,
