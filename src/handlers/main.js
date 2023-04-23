@@ -494,7 +494,7 @@ function timeFormatter(seconds) {
 }
 
 const job = new CronJob(
-    "00 12 * * *",
+    "03 00 12 * * *",
     sendStatus,
     null,
     true,
