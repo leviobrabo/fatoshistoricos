@@ -472,7 +472,7 @@ async function sendStatus() {
     const uptime = process.uptime();
     const uptime_formatted = timeFormatter(uptime);
     await bot.editMessageText(
-        `Ping: \`${m_s}ms\`\nUptime: \`${uptime_formatted}\``,
+        `#Fatoshistbot #Status\n\nStatus: ON\nPing: \`${m_s}ms\`\nUptime: \`${uptime_formatted}\``,
         {
             chat_id: replied.chat.id,
             message_id: replied.message_id,
@@ -494,7 +494,7 @@ function timeFormatter(seconds) {
 }
 
 const job = new CronJob(
-    "37 11 * * *",
+    "39 11 * * *",
     sendStatus,
     null,
     true,
