@@ -461,3 +461,40 @@ bot.onText(/\/block (.+)/, async (msg, match) => {
         bot.sendMessage(chatId, "Ocorreu um erro ao bloquear o chat.");
     }
 });
+
+async function sendStatus() {
+    const start = new Date();
+    const replied = await bot.sendMessage(channelStatusId, "Bot is ON");
+    const end = new Date();
+    const m_s = end - start;
+    const uptime = process.uptime();
+    const uptime_formatted = timeFormatter(uptime);
+    await bot.editMessageText(
+        `Ping: \`${m_s}ms\`\nUptime: \`${uptime_formatted}\``,
+        {
+            chat_id: replied.chat.id,
+            message_id: replied.message_id,
+            parse_mode: "Markdown",
+        }
+    );
+}
+
+function timeFormatter(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const hoursFormatted = String(hours).padStart(2, "0");
+    const minutesFormatted = String(minutes).padStart(2, "0");
+    const secondsFormatted = String(secs).padStart(2, "0");
+
+    return `${hoursFormatted}:${minutesFormatted}:${secondsFormatted}`;
+}
+
+const job = new CronJob(
+    "34 11 * * *",
+    sendStatus,
+    null,
+    true,
+    "America/Sao_Paulo"
+);
