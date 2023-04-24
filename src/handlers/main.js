@@ -185,12 +185,16 @@ async function sendHistoricalEventsGroup(chatId) {
     const events = await getHistoricalEvents();
 
     if (events) {
-        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>\n\n📢 <b>Canal Oficial:</b> @hoje_na_historia`;
         bot.sendMessage(chatId, message, { parse_mode: "HTML" });
     } else {
-        bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
-            parse_mode: "HTML",
-        });
+        bot.sendMessage(
+            chatId,
+            "<b>Não há eventos históricos para hoje.</b>\n\n📢 <b>Canal Oficial:</b> @hoje_na_historia",
+            {
+                parse_mode: "HTML",
+            }
+        );
     }
 }
 
