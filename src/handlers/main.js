@@ -149,7 +149,7 @@ bot.on("new_chat_members", async (msg) => {
 
 bot.on("left_chat_member", async (msg) => {
     const botUser = await bot.getMe();
-    if (msg.left_chat_member.id === botUser.id) {
+    if (msg.left_chat_member.id === botUser.id && msg.chat.id === groupId) {
         console.log("Bot left the group!");
 
         try {
