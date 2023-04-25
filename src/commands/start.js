@@ -18,7 +18,7 @@ function startCommand(bot, message) {
                 ],
                 [
                     {
-                        text: "👾 Canal",
+                        text: "👾 Canal de figurinhas",
                         url: "https://t.me/lbrabo",
                     },
                     {
