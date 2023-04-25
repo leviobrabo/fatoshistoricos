@@ -199,13 +199,14 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const manhaJob = new CronJob(
-    "2 9 * * *",
+    "0 8 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
                 sendHistoricalEventsGroup(chatId);
+                console.log(`Mensagem enviada com sucesso para os grupos`);
             }
         }
     },
@@ -248,6 +249,7 @@ const channelJob = new CronJob(
     "0 5 * * *",
     function () {
         sendHistoricalEventsChannel(channelId);
+        console.log(`Mensagem enviada com sucesso para o canal ${channelId}`);
     },
     null,
     true,
