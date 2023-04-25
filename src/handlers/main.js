@@ -199,9 +199,9 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const manhaJob = new CronJob(
-    "0 9 * * *",
+    "2 9 * * *",
     async function () {
-        const chatModels = await ChatModel.find({ isBlocked: false });
+        const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
