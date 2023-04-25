@@ -76,23 +76,21 @@ bot.on("new_chat_members", async (msg) => {
     const chatName = msg.chat.title;
 
     try {
-        if (chatId === groupId) {
+        const chat = await ChatModel.findOne({ chatId: chatId });
+
+        if (chat) {
             console.log(
-                `Não é necessário salvar o registro no banco de dados, pois ${groupId} é um grupo de log.`
+                `Grupo ${chatName} (${chatId}) já existe no banco de dados`
+            );
+        } else if (chatId === groupId) {
+            console.log(
+                `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
             );
         } else {
-            const chat = await ChatModel.findOne({ chatId: chatId });
-
-            if (chat) {
-                console.log(
-                    `Grupo ${chatName} (${chatId}) já existe no banco de dados`
-                );
-            } else {
-                const newChat = await ChatModel.create({ chatId, chatName });
-                console.log(
-                    `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
-                );
-            }
+            const newChat = await ChatModel.create({ chatId, chatName });
+            console.log(
+                `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
+            );
 
             const botUser = await bot.getMe();
             const newMembers = msg.new_chat_members.filter(
