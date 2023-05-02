@@ -510,3 +510,49 @@ const job = new CronJob(
     true,
     "America/Sao_Paulo"
 );
+
+async function sendTest(chatId) {
+    const events = await getHistoricalEvents();
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [
+                {
+                    text: "Canal Oficial",
+                    url: "https://t.me/hoje_na_historia",
+                },
+            ],
+        ],
+    };
+
+    if (events) {
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        bot.sendMessage(chatId, message, {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        });
+    } else {
+        bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        });
+    }
+}
+
+const testeJob = new CronJob(
+    "15 17 * * *",
+    async function () {
+        const chatModels = await ChatModel.find({});
+        for (const chatModel of chatModels) {
+            const chatId = chatModel.chatId;
+            if (chatId !== groupId) {
+                sendTest(chatId);
+                console.log(`Mensagem enviada com sucesso para os grupos`);
+            }
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+testeJob.start();
