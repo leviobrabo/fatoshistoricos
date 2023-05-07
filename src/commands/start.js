@@ -26,6 +26,16 @@ function startCommand(bot, message) {
                         callback_data: "donate",
                     },
                 ],
+                [
+                    {
+                        text: "🇧🇷 Canal Oficial (PT-BR)",
+                        url: "https://t.me/hoje_na_historia",
+                    },
+                    {
+                        text: "🇺🇸 Canal Oficial (EN-US)",
+                        url: "https://t.me/today_in_historys",
+                    },
+                ],
             ],
         },
     };
