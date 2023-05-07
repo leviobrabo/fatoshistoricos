@@ -549,23 +549,11 @@ async function getHistoricalEventsEn() {
 
 async function sendHistoricalEventsChannel(channelIdEn) {
     const events = await getHistoricalEventsEn();
-    const inlineKeyboard = {
-        inline_keyboard: [
-            [
-                {
-                    text: "📢 Official Channel",
-                    url: "https://t.me/hoje_na_historia",
-                },
-            ],
-        ],
-    };
-
     if (events) {
         const message = `<b>TODAY IN HISTORY</b>\n\n📅 Event on <b>${day}/${month}</b>\n\n<i>${events}</i>`;
         const translatedMessage = await translate(message, { to: "en" });
         bot.sendMessage(channelIdEn, translatedMessage, {
             parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
         });
     } else {
         const errorMessage = "<b>There are no historical events for today.</b>";
@@ -574,13 +562,12 @@ async function sendHistoricalEventsChannel(channelIdEn) {
         });
         bot.sendMessage(channelIdEn, translatedErrorMessage, {
             parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
         });
     }
 }
 
 const channelEnJob = new CronJob(
-    "15 14 * * *",
+    "0 6 * * *",
     function () {
         sendHistoricalEventsChannel(channelIdEn);
         console.log(`Mensagem enviada com sucesso para o canal ${channelIdEn}`);
