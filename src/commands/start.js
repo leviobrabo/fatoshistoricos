@@ -4,7 +4,7 @@ function startCommand(bot, message) {
     }
     const firstName = message.from.first_name;
 
-    const message_start = `Olá, <b>${firstName}</b>! \n\nEu sou <b>Fatos Históricos</b>, sou um bot que envia diáriamente mensagem com acontecimentos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📢 <b>Ajuda</b> /help\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
+    const message_start = `Olá, <b>${firstName}</b>! \n\nEu sou <b>Fatos Históricos</b>, sou um bot que envia diáriamente mensagem com acontecimentos históricos acontecido no dia do envio da mensagem.\n\nO envio da mensagem no chat privado é automático, se optar por não receber, digite /sendoff e se quiser voltar a receber digite /sendon\n\n<b>A mensagem é enviada todos os dias às 8 horas</b>\n\nAdicione-me em seu grupo para receber as mensagem lá.\n\n<b>Comandos:</b> /help\n\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
     const options_start = {
         parse_mode: "HTML",
         disable_web_page_preview: true,

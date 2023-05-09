@@ -130,6 +130,7 @@ bot.on("message", async (msg) => {
                 username: msg.from.username,
                 firstname: msg.from.first_name,
                 lastname: msg.from.last_name,
+                msg_private: true,
             });
 
             await user.save();
@@ -612,3 +613,104 @@ const job = new CronJob(
     true,
     "America/Sao_Paulo"
 );
+
+async function sendHistoricalEventsUser(userId) {
+    const events = await getHistoricalEvents();
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [
+                {
+                    text: "📢 Canal Oficial",
+                    url: "https://t.me/hoje_na_historia",
+                },
+            ],
+        ],
+    };
+
+    if (events) {
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        bot.sendMessage(userId, message, {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        });
+    } else {
+        bot.sendMessage(userId, "<b>Não há eventos históricos para hoje.</b>", {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        });
+    }
+}
+
+const userJob = new CronJob(
+    "52 16 * * *",
+    async function () {
+        const users = await UserModel.find({ msg_private: true });
+        for (const user of users) {
+            const userId = user.user_id;
+            sendHistoricalEventsUser(userId);
+            console.log(
+                `Mensagem enviada com sucesso para o usuário ${userId}`
+            );
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+userJob.start();
+
+bot.onText(/\/sendoff/, async (msg) => {
+    if (msg.chat.type !== "private") {
+        return;
+    }
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    const user = await UserModel.findOne({ user_id: userId });
+    if (!user.msg_private) {
+        bot.sendMessage(
+            chatId,
+            "Você já desativou a função de receber a mensagem no chat privado."
+        );
+        return;
+    }
+    await UserModel.findOneAndUpdate(
+        { user_id: userId },
+        { msg_private: false },
+        { new: true }
+    );
+    console.log(
+        `Usuário ${userId} atualizou para não receber mensagem no privado`
+    );
+
+    bot.sendMessage(
+        chatId,
+        "Mensagens privadas desativadas. Você não irá receber mensagem às 8 horas todos os dias."
+    );
+});
+
+bot.onText(/\/sendon/, async (msg) => {
+    if (msg.chat.type !== "private") {
+        return;
+    }
+    const userId = msg.from.id;
+    const user = await UserModel.findOne({ user_id: userId });
+    if (user.msg_private) {
+        bot.sendMessage(
+            msg.chat.id,
+            "Você já ativou a função de receber a mensagem no chat privado."
+        );
+        return;
+    }
+    await UserModel.findOneAndUpdate(
+        { user_id: userId },
+        { msg_private: true },
+        { new: true }
+    );
+    console.log(`Usuário ${userId} atualizou para receber mensagem no privado`);
+
+    bot.sendMessage(
+        msg.chat.id,
+        "Mensagem privada ativada. Você irá receber mensagem às 8 horas todos os dias sobre fatos históricos."
+    );
+});

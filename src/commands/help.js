@@ -31,7 +31,11 @@ function helpCommand(bot, message) {
         const messageId = callbackQuery.message.message_id;
 
         if (callbackQuery.data === "commands") {
-            const commands = ["/fotoshist - Fotos de fatos históricos 🙂"];
+            const commands = [
+                "/fotoshist - Fotos de fatos históricos 🙂",
+                "/sendon - Receberá às 8 horas a mensagem diária",
+                "/sendoff - Não receberá às 8 horas a mensagem diária",
+            ];
             await bot.editMessageText(
                 "<b>Lista de Comandos:</b> \n\n" + commands.join("\n"),
                 {
