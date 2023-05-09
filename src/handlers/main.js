@@ -204,7 +204,7 @@ bot.on("new_chat_members", async (msg) => {
                         inline_keyboard: [
                             [
                                 {
-                                    text: "🇧🇷 Canal Oficial (PT-BR)",
+                                    text: "Canal Oficial 🇧🇷",
                                     url: "https://t.me/hoje_na_historia",
                                 },
                             ],
