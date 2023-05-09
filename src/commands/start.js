@@ -4,7 +4,7 @@ function startCommand(bot, message) {
     }
     const firstName = message.from.first_name;
 
-    const message_start = `Olá, <b>${firstName}</b>! \n\nEu sou <b>Fatos Históricos</b>, sou um bot que envia diáriamente mensagem com acontecimentos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📢 <b>Canal Oficial:</b> <a href="https://t.me/hoje_na_historia">Hoje na História</a>\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
+    const message_start = `Olá, <b>${firstName}</b>! \n\nEu sou <b>Fatos Históricos</b>, sou um bot que envia diáriamente mensagem com acontecimentos históricos acontecido no dia do envio da mensagem. \n\nAdicione-me em seu grupo.\n\n📢 <b>Ajuda</b> /help\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
     const options_start = {
         parse_mode: "HTML",
         disable_web_page_preview: true,
@@ -28,12 +28,8 @@ function startCommand(bot, message) {
                 ],
                 [
                     {
-                        text: "🇧🇷 Canal Oficial (PT-BR)",
+                        text: "Canal Oficial 🇧🇷",
                         url: "https://t.me/hoje_na_historia",
-                    },
-                    {
-                        text: "🇺🇸 Canal Oficial (EN-US)",
-                        url: "https://t.me/today_in_historys",
                     },
                 ],
             ],
