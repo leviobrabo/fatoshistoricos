@@ -173,6 +173,13 @@ bot.on("new_chat_members", async (msg) => {
                 `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
             );
         } else {
+            if (chatId === groupId) {
+                console.log(
+                    `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
+                );
+                return;
+            }
+
             const newChat = await ChatModel.create({ chatId, chatName });
             console.log(
                 `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
