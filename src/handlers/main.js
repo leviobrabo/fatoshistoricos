@@ -640,10 +640,28 @@ async function sendHistoricalEventsUser(userId) {
 
     if (events) {
         const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-        bot.sendMessage(userId, message, {
-            parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
-        });
+        try {
+            await bot.sendMessage(userId, message, {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+            });
+            console.log(
+                `Mensagem enviada com sucesso para o usuário ${userId}`
+            );
+        } catch (error) {
+            console.log(
+                `Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`
+            );
+            if (error.response && error.response.statusCode === 403) {
+                await UserModel.findOneAndUpdate(
+                    { user_id: userId },
+                    { msg_private: false }
+                );
+                console.log(
+                    `O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`
+                );
+            }
+        }
     } else {
         bot.sendMessage(userId, "<b>Não há eventos históricos para hoje.</b>", {
             parse_mode: "HTML",
@@ -658,10 +676,7 @@ const userJob = new CronJob(
         const users = await UserModel.find({ msg_private: true });
         for (const user of users) {
             const userId = user.user_id;
-            sendHistoricalEventsUser(userId);
-            console.log(
-                `Mensagem enviada com sucesso para o usuário ${userId}`
-            );
+            await sendHistoricalEventsUser(userId);
         }
     },
     null,
