@@ -31,11 +31,6 @@
             "description": "Developers id ",
             "value": "",
             "required": true
-        },
-        "channelIdEn": {
-            "description": "Channel ID post Telegram.",
-            "value": "",
-            "required": true
         }
     }
 }
