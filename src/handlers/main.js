@@ -210,7 +210,7 @@ bot.on("new_chat_members", async (msg) => {
 
             bot.sendMessage(
                 chatId,
-                "Olá, meu nome é Fatos Históricos! Obrigado por me adicionado em seu grupo.\n\nEu enviarei mensagem todos os dias às 8 horas e possuo alguns comandos.",
+                "Olá, meu nome é Fatos Históricos! Obrigado por me adicionado em seu grupo.\n\nEu enviarei mensagem todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos me fornceça administrador com função de fixar mensagem e convidar usuários via link",
                 {
                     reply_markup: {
                         inline_keyboard: [
@@ -411,6 +411,9 @@ bot.onText(/^(\/broadcast|\/bc)\b/, async (msg, match) => {
     if (!(await is_dev(user_id))) {
         return;
     }
+    if (msg.chat.type !== "private") {
+        return;
+    }
 
     const query = match.input.substring(match[0].length).trim();
     if (!query) {
@@ -464,6 +467,7 @@ bot.onText(/^(\/broadcast|\/bc)\b/, async (msg, match) => {
         }
     );
 });
+
 bot.onText(/\/dev/, async (message) => {
     const userId = message.from.id;
     if (message.chat.type !== "private") {
@@ -505,6 +509,7 @@ bot.onText(/\/dev/, async (message) => {
                 "/ping - veja a latência da VPS",
                 "/block - bloqueia um chat de receber a mensagem",
                 "/grupos - lista todos os grupos do db",
+                "/sendgp - encaminha msg para grupos",
             ];
             await bot.editMessageText(
                 "<b>Lista de Comandos:</b> \n\n" + commands.join("\n"),
@@ -686,57 +691,84 @@ const userJob = new CronJob(
 
 userJob.start();
 
-bot.onText(/\/sendoff/, async (msg) => {
+bot.onText(/\/sendgp/, async (msg, match) => {
+    const user_id = msg.from.id;
+    if (!(await is_dev(user_id))) {
+        return;
+    }
     if (msg.chat.type !== "private") {
         return;
     }
-    const chatId = msg.chat.id;
-    const userId = msg.from.id;
-    const user = await UserModel.findOne({ user_id: userId });
-    if (!user.msg_private) {
-        bot.sendMessage(
-            chatId,
-            "Você já desativou a função de receber a mensagem no chat privado."
-        );
-        return;
-    }
-    await UserModel.findOneAndUpdate(
-        { user_id: userId },
-        { msg_private: false },
-        { new: true }
-    );
-    console.log(
-        `Usuário ${userId} atualizou para não receber mensagem no privado`
-    );
 
-    bot.sendMessage(
-        chatId,
-        "Mensagens privadas desativadas. Você não irá receber mensagem às 8 horas todos os dias."
-    );
-});
+    const sentMsg = await bot.sendMessage(msg.chat.id, "<i>Processing...</i>", {
+        parse_mode: "HTML",
+    });
+    const web_preview = match.input.startsWith("-d");
+    const query = web_preview ? match.input.substring(6).trim() : match.input;
+    const ulist = await ChatModel.find().lean().select("chatId");
+    let success_br = 0;
+    let no_success = 0;
+    let block_num = 0;
 
-bot.onText(/\/sendon/, async (msg) => {
-    if (msg.chat.type !== "private") {
-        return;
+    // Check if the message is a reply and forward it instead of sending a new message
+    if (msg.reply_to_message) {
+        const replyMsg = msg.reply_to_message;
+        for (const { chatId } of ulist) {
+            try {
+                await bot.forwardMessage(
+                    chatId,
+                    replyMsg.chat.id,
+                    replyMsg.message_id
+                );
+                success_br += 1;
+            } catch (err) {
+                if (
+                    err.response &&
+                    err.response.body &&
+                    err.response.body.error_code === 403
+                ) {
+                    block_num += 1;
+                } else {
+                    no_success += 1;
+                }
+            }
+        }
+    } else {
+        for (const { chatId } of ulist) {
+            try {
+                await bot.sendMessage(chatId, query, {
+                    disable_web_page_preview: !web_preview,
+                    parse_mode: "HTML",
+                    reply_to_message_id: msg.message_id,
+                });
+                success_br += 1;
+            } catch (err) {
+                if (
+                    err.response &&
+                    err.response.body &&
+                    err.response.body.error_code === 403
+                ) {
+                    block_num += 1;
+                } else {
+                    no_success += 1;
+                }
+            }
+        }
     }
-    const userId = msg.from.id;
-    const user = await UserModel.findOne({ user_id: userId });
-    if (user.msg_private) {
-        bot.sendMessage(
-            msg.chat.id,
-            "Você já ativou a função de receber a mensagem no chat privado."
-        );
-        return;
-    }
-    await UserModel.findOneAndUpdate(
-        { user_id: userId },
-        { msg_private: true },
-        { new: true }
-    );
-    console.log(`Usuário ${userId} atualizou para receber mensagem no privado`);
 
-    bot.sendMessage(
-        msg.chat.id,
-        "Mensagem privada ativada. Você irá receber mensagem às 8 horas todos os dias sobre fatos históricos."
+    await bot.editMessageText(
+        `
+  ╭─❑ 「 <b>Broadcast Completed</b> 」 ❑──
+  │- <i>Total Group:</i> \`${ulist.length}\`
+  │- <i>Successful:</i> \`${success_br}\`
+  │- <i>Removed:</i> \`${block_num}\`
+  │- <i>Failed:</i> \`${no_success}\`
+  ╰❑
+    `,
+        {
+            chat_id: sentMsg.chat.id,
+            message_id: sentMsg.message_id,
+            parse_mode: "HTML",
+        }
     );
 });
