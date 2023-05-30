@@ -948,3 +948,18 @@ bot.onText(/\/fwrds/, async (msg) => {
         );
     }
 });
+
+async function updateForwardingForAllGroups() {
+    try {
+        await ChatModel.updateMany(
+            { chatName: { $exists: false } },
+            { forwarding: true }
+        );
+        console.log("Encaminhamento ativado para todos os grupos.");
+    } catch (error) {
+        console.error(
+            "Erro ao atualizar o encaminhamento para todos os grupos:",
+            error
+        );
+    }
+}
