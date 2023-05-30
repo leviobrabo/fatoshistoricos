@@ -852,7 +852,7 @@ bot.onText(/\/fwdoff/, async (msg) => {
     }
 
     const chat = await ChatModel.findOne({ chatId: chat_id });
-    if (chat.forwarding === false) {
+    if (!chat || chat.forwarding === false) {
         await bot.sendMessage(chat_id, "O encaminhamento já está desativado.");
         return;
     }
@@ -888,7 +888,7 @@ bot.onText(/\/fwdon/, async (msg) => {
     }
 
     const chat = await ChatModel.findOne({ chatId: chat_id });
-    if (chat.forwarding === true) {
+    if (!chat || chat.forwarding === true) {
         await bot.sendMessage(chat_id, "O encaminhamento já está habilitado.");
         return;
     }
