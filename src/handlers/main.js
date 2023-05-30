@@ -698,6 +698,61 @@ const userJob = new CronJob(
 
 userJob.start();
 
+bot.onText(/\/sendoff/, async (msg) => {
+    if (msg.chat.type !== "private") {
+        return;
+    }
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    const user = await UserModel.findOne({ user_id: userId });
+    if (!user.msg_private) {
+        bot.sendMessage(
+            chatId,
+            "Você já desativou a função de receber a mensagem no chat privado."
+        );
+        return;
+    }
+    await UserModel.findOneAndUpdate(
+        { user_id: userId },
+        { msg_private: false },
+        { new: true }
+    );
+    console.log(
+        `Usuário ${userId} atualizou para não receber mensagem no privado`
+    );
+
+    bot.sendMessage(
+        chatId,
+        "Mensagens privadas desativadas. Você não irá receber mensagem às 8 horas todos os dias."
+    );
+});
+
+bot.onText(/\/sendon/, async (msg) => {
+    if (msg.chat.type !== "private") {
+        return;
+    }
+    const userId = msg.from.id;
+    const user = await UserModel.findOne({ user_id: userId });
+    if (user.msg_private) {
+        bot.sendMessage(
+            msg.chat.id,
+            "Você já ativou a função de receber a mensagem no chat privado."
+        );
+        return;
+    }
+    await UserModel.findOneAndUpdate(
+        { user_id: userId },
+        { msg_private: true },
+        { new: true }
+    );
+    console.log(`Usuário ${userId} atualizou para receber mensagem no privado`);
+
+    bot.sendMessage(
+        msg.chat.id,
+        "Mensagem privada ativada. Você irá receber mensagem às 8 horas todos os dias sobre fatos históricos."
+    );
+});
+
 bot.onText(/\/sendgp/, async (msg, match) => {
     const user_id = msg.from.id;
     if (!(await is_dev(user_id))) {
