@@ -15,6 +15,11 @@ const ChatSchema = new Schema({
         required: true,
         default: false,
     },
+    forwarding: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
 });
 
 module.exports = ChatSchema;

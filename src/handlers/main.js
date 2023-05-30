@@ -177,7 +177,11 @@ bot.on("new_chat_members", async (msg) => {
                 return;
             }
 
-            const newChat = await ChatModel.create({ chatId, chatName });
+            const newChat = await ChatModel.create({
+                chatId,
+                chatName,
+                forwarding: true,
+            });
             console.log(
                 `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
             );
@@ -510,6 +514,9 @@ bot.onText(/\/dev/, async (message) => {
                 "/block - bloqueia um chat de receber a mensagem",
                 "/grupos - lista todos os grupos do db",
                 "/sendgp - encaminha msg para grupos",
+                "/fwdoff - desativa o encaminhamento no grupo",
+                "/fwdon - ativa o encaminhamento no grupo",
+                "/fwrds - Lista de grupos com encaminhamento desabilitado",
             ];
             await bot.editMessageText(
                 "<b>Lista de Comandos:</b> \n\n" + commands.join("\n"),
@@ -705,12 +712,13 @@ bot.onText(/\/sendgp/, async (msg, match) => {
     });
     const web_preview = match.input.startsWith("-d");
     const query = web_preview ? match.input.substring(6).trim() : match.input;
-    const ulist = await ChatModel.find().lean().select("chatId");
+    const ulist = await ChatModel.find({ forwarding: true })
+        .lean()
+        .select("chatId");
     let success_br = 0;
     let no_success = 0;
     let block_num = 0;
 
-    // Check if the message is a reply and forward it instead of sending a new message
     if (msg.reply_to_message) {
         const replyMsg = msg.reply_to_message;
         for (const { chatId } of ulist) {
@@ -771,4 +779,139 @@ bot.onText(/\/sendgp/, async (msg, match) => {
             parse_mode: "HTML",
         }
     );
+});
+
+bot.onText(/\/fwdoff/, async (msg) => {
+    if (msg.chat.type !== "group" && msg.chat.type !== "supergroup") {
+        return;
+    }
+
+    const user_id = msg.from.id;
+    const chat_id = msg.chat.id;
+
+    const chatAdmins = await bot.getChatAdministrators(chat_id);
+    const isAdmin = chatAdmins.some((admin) => admin.user.id === user_id);
+
+    if (!isAdmin) {
+        return;
+    }
+
+    const chat = await ChatModel.findOne({ chatId: chat_id });
+    if (chat.forwarding === false) {
+        await bot.sendMessage(chat_id, "O encaminhamento já está desativado.");
+        return;
+    }
+
+    try {
+        await ChatModel.updateMany({ chatId: chat_id }, { forwarding: false });
+        console.log(
+            `O bate-papo com ID ${chat_id} foi atualizado. Encaminhamento definido como falso.`
+        );
+        await bot.sendMessage(chat_id, "O encaminhamento foi desativado.");
+    } catch (error) {
+        console.error("Erro ao desativar o encaminhamento:", error);
+        await bot.sendMessage(
+            chat_id,
+            "Ocorreu um erro ao desativar o encaminhamento."
+        );
+    }
+});
+
+bot.onText(/\/fwdon/, async (msg) => {
+    if (msg.chat.type !== "group" && msg.chat.type !== "supergroup") {
+        return;
+    }
+
+    const user_id = msg.from.id;
+    const chat_id = msg.chat.id;
+
+    const chatAdmins = await bot.getChatAdministrators(chat_id);
+    const isAdmin = chatAdmins.some((admin) => admin.user.id === user_id);
+
+    if (!isAdmin) {
+        return;
+    }
+
+    const chat = await ChatModel.findOne({ chatId: chat_id });
+    if (chat.forwarding === true) {
+        await bot.sendMessage(chat_id, "O encaminhamento já está habilitado.");
+        return;
+    }
+
+    try {
+        await ChatModel.updateMany({ chatId: chat_id }, { forwarding: true });
+        console.log(
+            `O bate-papo com ID ${chat_id} foi atualizado. Encaminhamento definido como verdadeiro.`
+        );
+        await bot.sendMessage(chat_id, "O encaminhamento foi ativado.");
+    } catch (error) {
+        console.error("Erro ao ativar o encaminhamento:", error);
+        await bot.sendMessage(
+            chat_id,
+            "Ocorreu um erro ao ativar o encaminhamento."
+        );
+    }
+});
+
+bot.onText(/\/fwrds/, async (msg) => {
+    if (msg.chat.type !== "private") {
+        return;
+    }
+
+    const user_id = msg.from.id;
+
+    if (!(await is_dev(user_id))) {
+        return;
+    }
+
+    try {
+        const groups = await ChatModel.find({ forwarding: false })
+            .lean()
+            .select("chatId chatName");
+
+        if (groups.length === 0) {
+            await bot.sendMessage(
+                msg.chat.id,
+                "Nenhum grupo encontrado com encaminhamento desativado."
+            );
+        } else {
+            let response = "Grupos com encaminhamento desativado:\n\n";
+
+            groups.forEach((group) => {
+                response += `Chat ID: ${group.chatId} || Chat Name: ${
+                    group.chatName || "-"
+                }\n`;
+            });
+
+            await bot.sendMessage(msg.chat.id, response);
+        }
+    } catch (error) {
+        console.error("Erro ao recuperar grupos:", error);
+        await bot.sendMessage(
+            msg.chat.id,
+            "Ocorreu um erro ao recuperar os grupos."
+        );
+    }
+});
+
+bot.on("message", async (msg) => {
+    if (msg.chat.type !== "group" && msg.chat.type !== "supergroup") {
+        return;
+    }
+
+    const chatId = msg.chat.id;
+
+    try {
+        const chat = await ChatModel.findOne({ chatId });
+
+        if (chat) {
+            chat.forwarding = true;
+            await chat.save();
+            console.log(
+                `Chat with ID ${chatId} has been updated. Forwarding set to true.`
+            );
+        }
+    } catch (error) {
+        console.error("Error updating chat forwarding:", error);
+    }
 });

@@ -35,6 +35,8 @@ function helpCommand(bot, message) {
                 "/fotoshist - Fotos de fatos históricos 🙂",
                 "/sendon - Receberá às 8 horas a mensagem diária",
                 "/sendoff - Não receberá às 8 horas a mensagem diária",
+                "/fwdoff - desativa o encaminhamento no grupo",
+                "/fwdon - ativa o encaminhamento no grupo",
             ];
             await bot.editMessageText(
                 "<b>Lista de Comandos:</b> \n\n" + commands.join("\n"),
