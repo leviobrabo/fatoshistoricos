@@ -949,16 +949,14 @@ bot.onText(/\/fwrds/, async (msg) => {
     }
 });
 
-async function updateForwardingForAllGroups() {
+async function updateForwardingForAllGroups(chatId) {
     try {
-        await ChatModel.updateMany(
-            { chatName: { $exists: false } },
-            { forwarding: true }
-        );
-        console.log("Encaminhamento ativado para todos os grupos.");
+        await ChatModel.updateMany({ chatId: chatId }, { forwarding: true });
+        console.log("Encaminhamento ativado para o grupo com chatId", chatId);
     } catch (error) {
         console.error(
-            "Erro ao atualizar o encaminhamento para todos os grupos:",
+            "Erro ao atualizar o encaminhamento para o grupo com chatId",
+            chatId,
             error
         );
     }
