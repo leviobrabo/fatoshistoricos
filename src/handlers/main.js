@@ -893,25 +893,3 @@ bot.onText(/\/fwrds/, async (msg) => {
         );
     }
 });
-
-bot.on("message", async (msg) => {
-    if (msg.chat.type !== "group" && msg.chat.type !== "supergroup") {
-        return;
-    }
-
-    const chatId = msg.chat.id;
-
-    try {
-        const chat = await ChatModel.findOne({ chatId });
-
-        if (chat) {
-            chat.forwarding = true;
-            await chat.save();
-            console.log(
-                `Chat with ID ${chatId} has been updated. Forwarding set to true.`
-            );
-        }
-    } catch (error) {
-        console.error("Error updating chat forwarding:", error);
-    }
-});
