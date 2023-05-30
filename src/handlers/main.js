@@ -963,3 +963,5 @@ async function updateForwardingForAllGroups() {
         );
     }
 }
+
+updateForwardingForAllGroups();
