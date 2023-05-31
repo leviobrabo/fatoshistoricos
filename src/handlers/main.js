@@ -951,11 +951,11 @@ bot.onText(/\/fwrds/, async (msg) => {
 
 async function updateForwardingForAllGroups() {
     try {
-        await ChatModel.updateMany({}, { forwarding: true });
-        console.log("Encaminhamento ativado para todos os grupos.");
+        await ChatModel.updateMany({}, { isBlocked: false });
+        console.log("banimento desativado para todos os grupos.");
     } catch (error) {
         console.error(
-            "Erro ao atualizar o encaminhamento para todos os grupos:",
+            "Erro ao atualizar o banimento para todos os grupos:",
             error
         );
     }
