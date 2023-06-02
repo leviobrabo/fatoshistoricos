@@ -948,17 +948,3 @@ bot.onText(/\/fwrds/, async (msg) => {
         );
     }
 });
-
-async function updateForwardingForAllGroups() {
-    try {
-        await UserModel.updateMany({}, { is_dev: false });
-        console.log("usuaruios n são devs");
-    } catch (error) {
-        console.error(
-            "Erro ao atualizar o banimento para todos os grupos:",
-            error
-        );
-    }
-}
-
-updateForwardingForAllGroups();
