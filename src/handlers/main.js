@@ -162,85 +162,84 @@ bot.on("new_chat_members", async (msg) => {
     const chatName = msg.chat.title;
 
     try {
-        const chat = await ChatModel.findOne({ chatId: chatId });
-
-        if (chat) {
-            console.log(
-                `Grupo ${chatName} (${chatId}) já existe no banco de dados`
-            );
-        } else if (chatId === groupId) {
+        if (chatId === groupId) {
             console.log(
                 `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
             );
         } else {
-            if (chatId === groupId) {
-                return;
-            }
+            const chat = await ChatModel.findOne({ chatId: chatId });
 
-            const newChat = await ChatModel.create({
-                chatId,
-                chatName,
-                forwarding: true,
-            });
-            console.log(
-                `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
-            );
-
-            const botUser = await bot.getMe();
-            const newMembers = msg.new_chat_members.filter(
-                (member) => member.id === botUser.id
-            );
-
-            if (msg.chat.username) {
-                chatusername = `@${msg.chat.username}`;
+            if (chat) {
+                console.log(
+                    `Grupo ${chatName} (${chatId}) já existe no banco de dados`
+                );
             } else {
-                chatusername = "Private Group";
-            }
+                const newChat = await ChatModel.create({
+                    chatId,
+                    chatName,
+                    forwarding: true,
+                });
+                console.log(
+                    `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
+                );
 
-            if (newMembers.length > 0) {
-                const message = `#Fatoshistbot #New_Group
-            <b>Group:</b> ${chatName}
-            <b>ID:</b> <code>${chatId}</code>
-            <b>Link:</b> ${chatusername}`;
+                const botUser = await bot.getMe();
+                const newMembers = msg.new_chat_members.filter(
+                    (member) => member.id === botUser.id
+                );
 
-                bot.sendMessage(groupId, message, { parse_mode: "HTML" }).catch(
-                    (error) => {
+                if (msg.chat.username) {
+                    chatusername = `@${msg.chat.username}`;
+                } else {
+                    chatusername = "Private Group";
+                }
+
+                if (newMembers.length > 0) {
+                    const message = `#Fatoshistbot #New_Group
+                    <b>Group:</b> ${chatName}
+                    <b>ID:</b> <code>${chatId}</code>
+                    <b>Link:</b> ${chatusername}`;
+
+                    bot.sendMessage(groupId, message, {
+                        parse_mode: "HTML",
+                    }).catch((error) => {
                         console.error(
                             `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
                         );
+                    });
+                }
+
+                bot.sendMessage(
+                    chatId,
+                    "Olá, meu nome é Fatos Históricos! Obrigado por me adicionar em seu grupo.\n\nEu enviarei mensagens todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos, conceda-me as permissões de administrador para fixar mensagens e convidar usuários via link.",
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: "Canal Oficial 🇧🇷",
+                                        url: "https://t.me/hoje_na_historia",
+                                    },
+                                ],
+                                [
+                                    {
+                                        text: "Relatar bugs",
+                                        url: "https://t.me/kylorensbot",
+                                    },
+                                ],
+                            ],
+                        },
                     }
                 );
             }
-
-            bot.sendMessage(
-                chatId,
-                "Olá, meu nome é Fatos Históricos! Obrigado por me adicionado em seu grupo.\n\nEu enviarei mensagem todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos me fornceça administrador com função de fixar mensagem e convidar usuários via link",
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                {
-                                    text: "Canal Oficial 🇧🇷",
-                                    url: "https://t.me/hoje_na_historia",
-                                },
-                            ],
-                            [
-                                {
-                                    text: "Relate bugs",
-                                    url: "https://t.me/kylorensbot",
-                                },
-                            ],
-                        ],
-                    },
-                }
-            );
         }
+
         const developerMembers = msg.new_chat_members.filter(
             (member) => member.is_bot === false && is_dev(member.id)
         );
 
         if (developerMembers.length > 0) {
-            const message = `👨‍💻 <b>ᴜᴍ ᴅᴏs ᴍᴇᴜs ᴅᴇsᴇɴᴠᴏʟᴠᴇᴅᴏʀᴇs ᴇɴᴛʀᴏᴜ ɴᴏ ɢʀᴜᴘᴏ</b> <a href="tg://user?id=${developerMembers[0].id}">${developerMembers[0].first_name}</a> 😎👍`;
+            const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMembers[0].id}">${developerMembers[0].first_name}</a> 😎👍`;
             bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch(
                 (error) => {
                     console.error(
