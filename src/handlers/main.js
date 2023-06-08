@@ -1095,7 +1095,7 @@ async function getHolidaysOfTheDay() {
                 messageParts.push(holidayMessage);
             });
 
-            let message = `<b>ℹ️ Feriados neste dia, ${day}/${month}</b>\n\n`;
+            let message = `<b>ℹ️ Datas comemorativas neste dia, ${day}/${month}</b>\n\n`;
 
             message += messageParts.join("\n\n");
 
