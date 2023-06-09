@@ -1125,6 +1125,16 @@ async function sendHistoricalEventsGroup(chatId) {
     const today = new Date();
     const day = today.getDate();
     const month = today.getMonth() + 1;
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [
+                {
+                    text: "📢 Canal Oficial",
+                    url: "https://t.me/hoje_na_historia",
+                },
+            ],
+        ],
+    };
 
     try {
         const response = await axios.get(
@@ -1134,16 +1144,21 @@ async function sendHistoricalEventsGroup(chatId) {
         const randomIndex = Math.floor(Math.random() * events.length);
         const event = events[randomIndex];
 
-        const caption = `<b>Você sabia?</b>\n\n<code>${event.text}</code>\n\n💬 Comente o que você achou abaixo`;
+        const caption = `<b>Você sabia?</b>\n\n<code>${event.text}</code>`;
+
+        const options = {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        };
 
         if (event.pages && event.pages[0].thumbnail) {
             const photoUrl = event.pages[0].thumbnail.source;
             await bot.sendPhoto(chatId, photoUrl, {
                 caption,
-                parse_mode: "HTML",
+                ...options,
             });
         } else {
-            await bot.sendMessage(chatId, caption, { parse_mode: "HTML" });
+            await bot.sendMessage(chatId, caption, options);
         }
 
         console.log(`Historical event sent successfully to chatID ${chatId}.`);
@@ -1152,8 +1167,8 @@ async function sendHistoricalEventsGroup(chatId) {
     }
 }
 
-const tardJob = new CronJob(
-    "40 21 * * *",
+const tardJob1 = new CronJob(
+    "0 15 * * *",
     async function () {
         const chatModels = await ChatModel.find({});
         for (const chatModel of chatModels) {
@@ -1171,4 +1186,25 @@ const tardJob = new CronJob(
     "America/Sao_Paulo"
 );
 
-tardJob.start();
+tardJob1.start();
+
+const tardJob2 = new CronJob(
+    "00 18 * * *",
+    async function () {
+        const chatModels = await ChatModel.find({});
+        for (const chatModel of chatModels) {
+            const chatId = chatModel.chatId;
+            if (chatId !== groupId) {
+                sendHistoricalEventsGroup(chatId);
+                console.log(
+                    `Mensagem enviada com sucesso para o chatID ${chatId}`
+                );
+            }
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+tardJob2.start();
