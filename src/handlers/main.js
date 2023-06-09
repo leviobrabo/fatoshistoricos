@@ -1003,7 +1003,7 @@ async function getDeathsOfTheDay() {
 }
 
 const death = new CronJob(
-    "00 19 * * *",
+    "00 15 * * *",
     getDeathsOfTheDay,
     null,
     true,
@@ -1057,7 +1057,7 @@ async function getBirthsOfTheDay() {
 }
 
 const birth = new CronJob(
-    "00 20 * * *",
+    "00 22 * * *",
     getBirthsOfTheDay,
     null,
     true,
@@ -1113,7 +1113,7 @@ async function getHolidaysOfTheDay() {
 }
 
 const holiday = new CronJob(
-    "00 21 * * *",
+    "30 23 * * *",
     getHolidaysOfTheDay,
     null,
     true,
