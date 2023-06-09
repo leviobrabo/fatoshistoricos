@@ -1120,3 +1120,55 @@ const holiday = new CronJob(
     "America/Sao_Paulo"
 );
 holiday.start();
+
+async function sendHistoricalEventsGroup(chatId) {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth() + 1;
+
+    try {
+        const response = await axios.get(
+            `https://pt.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
+        );
+        const events = response.data.events;
+        const randomIndex = Math.floor(Math.random() * events.length);
+        const event = events[randomIndex];
+
+        const caption = `<b>Você sabia?</b>\n\n<code>${event.text}</code>\n\n💬 Comente o que você achou abaixo`;
+
+        if (event.pages && event.pages[0].thumbnail) {
+            const photoUrl = event.pages[0].thumbnail.source;
+            await bot.sendPhoto(chatId, photoUrl, {
+                caption,
+                parse_mode: "HTML",
+            });
+        } else {
+            await bot.sendMessage(chatId, caption, { parse_mode: "HTML" });
+        }
+
+        console.log(`Historical event sent successfully to chatID ${chatId}.`);
+    } catch (error) {
+        console.error("Failed to send historical event:", error);
+    }
+}
+
+const tardJob = new CronJob(
+    "40 21 * * *",
+    async function () {
+        const chatModels = await ChatModel.find({});
+        for (const chatModel of chatModels) {
+            const chatId = chatModel.chatId;
+            if (chatId !== groupId) {
+                sendHistoricalEventsGroup(chatId);
+                console.log(
+                    `Mensagem enviada com sucesso para o chatID ${chatId}`
+                );
+            }
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+tardJob.start();
