@@ -1121,7 +1121,7 @@ const holiday = new CronJob(
 );
 holiday.start();
 
- async function sendHistoricalEventsGroup(chatId) {
+ async function sendHistoricalEventsGroupImage(chatId) {
     const today = new Date();
     const day = today.getDate();
     const month = today.getMonth() + 1;
@@ -1174,7 +1174,7 @@ const tardJob1 = new CronJob(
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
-                sendHistoricalEventsGroup(chatId);
+                sendHistoricalEventsGroupImage(chatId);
                 console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
             }
         }
@@ -1193,7 +1193,7 @@ const tardJob2 = new CronJob(
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
-                sendHistoricalEventsGroup(chatId);
+                sendHistoricalEventsGroupImage(chatId);
                 console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
             }
         }
