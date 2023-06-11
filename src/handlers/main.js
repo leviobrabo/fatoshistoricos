@@ -1121,7 +1121,7 @@ const holiday = new CronJob(
 );
 holiday.start();
 
-async function sendHistoricalEventsGroup(chatId) {
+ async function sendHistoricalEventsGroup(chatId) {
     const today = new Date();
     const day = today.getDate();
     const month = today.getMonth() + 1;
@@ -1170,14 +1170,12 @@ async function sendHistoricalEventsGroup(chatId) {
 const tardJob1 = new CronJob(
     "0 15 * * *",
     async function () {
-        const chatModels = await ChatModel.find({});
+        const chatModels = await ChatModel.find({ forwarding: true });
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
                 sendHistoricalEventsGroup(chatId);
-                console.log(
-                    `Mensagem enviada com sucesso para o chatID ${chatId}`
-                );
+                console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
             }
         }
     },
@@ -1191,14 +1189,12 @@ tardJob1.start();
 const tardJob2 = new CronJob(
     "00 18 * * *",
     async function () {
-        const chatModels = await ChatModel.find({});
+        const chatModels = await ChatModel.find({ forwarding: true });
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
                 sendHistoricalEventsGroup(chatId);
-                console.log(
-                    `Mensagem enviada com sucesso para o chatID ${chatId}`
-                );
+                console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
             }
         }
     },
