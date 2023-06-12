@@ -137,13 +137,11 @@ bot.on("message", async (msg) => {
             console.log(`Usuário ${msg.from.id} salvo no banco de dados.`);
 
             const message = `#Fatoshistbot #New_User
-        <b>User:</b> <a href="tg://user?id=${user.user_id}">${
-                user.firstname
-            }</a>
+        <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname
+                }</a>
         <b>ID:</b> <code>${user.user_id}</code>
-        <b>Username:</b> ${
-            user.username ? `@${user.username}` : "Não informado"
-        }`;
+        <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"
+                }`;
             bot.sendMessage(groupId, message, { parse_mode: "HTML" });
         }
     } catch (error) {
@@ -932,9 +930,8 @@ bot.onText(/\/fwrds/, async (msg) => {
             let response = "Grupos com encaminhamento desativado:\n\n";
 
             groups.forEach((group) => {
-                response += `Chat ID: ${group.chatId} || Chat Name: ${
-                    group.chatName || "-"
-                }\n`;
+                response += `Chat ID: ${group.chatId} || Chat Name: ${group.chatName || "-"
+                    }\n`;
             });
 
             await bot.sendMessage(msg.chat.id, response);
@@ -981,13 +978,12 @@ async function getDeathsOfTheDay() {
                 const info =
                     death.pages?.[0]?.extract || "Informações não disponíveis.";
                 const date = death.year || "Data desconhecida.";
-                const deathMessage = `<i>${
-                    index + 1
-                }.</i> <b>Nome:</b> ${name}\n<b>Informações:</b> ${info}\n<b>Data da morte:</b> ${date}`;
+                const deathMessage = `<i>${index + 1
+                    }.</i> <b>Nome:</b> ${name}\n<b>Informações:</b> ${info}\n<b>Data da morte:</b> ${date}`;
                 messageParts.push(deathMessage);
             });
 
-            let message = `<b>ℹ️ Mortes neste dia, ${day}/${month}</b>\n\n`;
+            let message = `<b>ℹ️ Mortes neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
 
             message += messageParts.join("\n\n");
 
@@ -1035,13 +1031,12 @@ async function getBirthsOfTheDay() {
                 const info =
                     birth.pages?.[0]?.extract || "Informações não disponíveis.";
                 const date = birth.year || "Data desconhecida.";
-                const birthMessage = `<i>${
-                    index + 1
-                }.</i> <b>Nome:</b> ${name}\n<b>Informações:</b> ${info}\n<b>Data de nascimento:</b> ${date}`;
+                const birthMessage = `<i>${index + 1
+                    }.</i> <b>Nome:</b> ${name}\n<b>Informações:</b> ${info}\n<b>Data de nascimento:</b> ${date}`;
                 messageParts.push(birthMessage);
             });
 
-            let message = `<b>ℹ️ Nascimentos neste dia, ${day}/${month}</b>\n\n`;
+            let message = `<b>ℹ️ Nascimentos neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
 
             message += messageParts.join("\n\n");
 
@@ -1089,13 +1084,12 @@ async function getHolidaysOfTheDay() {
                 const info =
                     holiday.pages?.[0]?.extract ||
                     "Informações não disponíveis.";
-                const holidayMessage = `<i>${
-                    index + 1
-                }.</i> <b>Nome:</b> ${name}\n<b>Informações:</b> ${info}`;
+                const holidayMessage = `<i>${index + 1
+                    }.</i> <b>Nome:</b> ${name}\n<b>Informações:</b> ${info}`;
                 messageParts.push(holidayMessage);
             });
 
-            let message = `<b>ℹ️ Datas comemorativas neste dia, ${day}/${month}</b>\n\n`;
+            let message = `<b>ℹ️ Datas comemorativas neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
 
             message += messageParts.join("\n\n");
 
@@ -1121,7 +1115,7 @@ const holiday = new CronJob(
 );
 holiday.start();
 
- async function sendHistoricalEventsGroupImage(chatId) {
+async function sendHistoricalEventsGroupImage(chatId) {
     const today = new Date();
     const day = today.getDate();
     const month = today.getMonth() + 1;
@@ -1167,7 +1161,7 @@ holiday.start();
     }
 }
 
-const tardJob1 = new CronJob(
+const tardJob = new CronJob(
     "0 15 * * *",
     async function () {
         const chatModels = await ChatModel.find({ forwarding: true });
@@ -1184,23 +1178,15 @@ const tardJob1 = new CronJob(
     "America/Sao_Paulo"
 );
 
-tardJob1.start();
+tardJob.start();
 
-const tardJob2 = new CronJob(
-    "00 18 * * *",
-    async function () {
-        const chatModels = await ChatModel.find({ forwarding: true });
-        for (const chatModel of chatModels) {
-            const chatId = chatModel.chatId;
-            if (chatId !== groupId) {
-                sendHistoricalEventsGroupImage(chatId);
-                console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
-            }
-        }
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
+function getMonthName(month) {
+    const monthNames = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+    ];
+    return monthNames[month - 1];
+}
 
-tardJob2.start();
+
+
