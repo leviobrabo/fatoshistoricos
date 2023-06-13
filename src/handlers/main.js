@@ -1036,7 +1036,7 @@ async function getBirthsOfTheDay() {
                 messageParts.push(birthMessage);
             });
 
-            let message = `<b>ℹ️ Nascimentos neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
+            let message = `<b>🔘 Nascimentos neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
 
             message += messageParts.join("\n\n");
 
@@ -1089,7 +1089,7 @@ async function getHolidaysOfTheDay() {
                 messageParts.push(holidayMessage);
             });
 
-            let message = `<b>ℹ️ Datas comemorativas neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
+            let message = `<b>🔘 Datas comemorativas neste dia, ${day} de ${getMonthName(month)}</b>\n\n`;
 
             message += messageParts.join("\n\n");
 
@@ -1187,6 +1187,4 @@ function getMonthName(month) {
     ];
     return monthNames[month - 1];
 }
-
-
 
