@@ -9,6 +9,7 @@ const userSchema = new Schema({
     updatedAt: { type: Date, default: Date.now },
     is_dev: { type: Boolean, required: true, default: false },
     msg_private: { type: Boolean, required: true, default: true },
+    messageId: { type: Number, required: false },
 });
 
 module.exports = userSchema;

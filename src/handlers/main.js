@@ -633,7 +633,6 @@ const job = new CronJob(
     true,
     "America/Sao_Paulo"
 );
-
 async function sendHistoricalEventsUser(userId) {
     const events = await getHistoricalEvents();
     const inlineKeyboard = {
@@ -650,25 +649,24 @@ async function sendHistoricalEventsUser(userId) {
     if (events) {
         const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
         try {
-            await bot.sendMessage(userId, message, {
+            const sentMessage = await bot.sendMessage(userId, message, {
                 parse_mode: "HTML",
                 reply_markup: inlineKeyboard,
             });
-            console.log(
-                `Mensagem enviada com sucesso para o usuário ${userId}`
+
+            const messageId = sentMessage.message_id;
+
+            await UserModel.findOneAndUpdate(
+                { user_id: userId },
+                { messageId: messageId }
             );
+
+            console.log(`Mensagem enviada com sucesso para o usuário ${userId}`);
         } catch (error) {
-            console.log(
-                `Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`
-            );
+            console.log(`Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`);
             if (error.response && error.response.statusCode === 403) {
-                await UserModel.findOneAndUpdate(
-                    { user_id: userId },
-                    { msg_private: false }
-                );
-                console.log(
-                    `O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`
-                );
+                await UserModel.findOneAndUpdate({ user_id: userId }, { msg_private: false });
+                console.log(`O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`);
             }
         }
     } else {
@@ -680,11 +678,22 @@ async function sendHistoricalEventsUser(userId) {
 }
 
 const userJob = new CronJob(
-    "0 8 * * *",
+    "56 10 * * *",
     async function () {
         const users = await UserModel.find({ msg_private: true });
         for (const user of users) {
             const userId = user.user_id;
+            const messageId = user.messageId;
+
+            if (messageId) {
+                try {
+                    await bot.deleteMessage(userId, messageId);
+                    console.log(`Mensagem anterior do usuário ${userId} excluída com sucesso`);
+                } catch (error) {
+                    console.log(`Erro ao excluir mensagem anterior do usuário ${userId}: ${error.message}`);
+                }
+            }
+
             await sendHistoricalEventsUser(userId);
         }
     },
