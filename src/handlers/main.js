@@ -739,23 +739,34 @@ bot.onText(/\/sendon/, async (msg) => {
     }
     const userId = msg.from.id;
     const user = await UserModel.findOne({ user_id: userId });
-    if (user.msg_private) {
+
+    if (!user) {
         bot.sendMessage(
             msg.chat.id,
-            "Você já ativou a função de receber a mensagem no chat privado."
+            "Usuário não encontrado. Por favor, faça o registro primeiro."
         );
         return;
     }
+
+    if (user.msg_private) {
+        bot.sendMessage(
+            msg.chat.id,
+            "Você já ativou a função de receber mensagens no chat privado."
+        );
+        return;
+    }
+
     await UserModel.findOneAndUpdate(
         { user_id: userId },
         { msg_private: true },
         { new: true }
     );
-    console.log(`Usuário ${userId} atualizou para receber mensagem no privado`);
+
+    console.log(`Usuário ${userId} atualizado para receber mensagens no privado`);
 
     bot.sendMessage(
         msg.chat.id,
-        "Mensagem privada ativada. Você irá receber mensagem às 8 horas todos os dias sobre fatos históricos."
+        "Mensagens privadas ativadas. Você receberá mensagens todos os dias às 8 horas sobre fatos históricos."
     );
 });
 
