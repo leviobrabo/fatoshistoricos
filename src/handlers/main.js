@@ -286,44 +286,52 @@ async function getHistoricalEvents() {
 }
 
 async function sendHistoricalEventsGroup(chatId) {
-    const events = await getHistoricalEvents();
-    const inlineKeyboard = {
-        inline_keyboard: [
-            [
-                {
-                    text: "📢 Canal Oficial",
-                    url: "https://t.me/hoje_na_historia",
-                },
+    try {
+        const events = await getHistoricalEvents();
+        const inlineKeyboard = {
+            inline_keyboard: [
+                [
+                    {
+                        text: "📢 Canal Oficial",
+                        url: "https://t.me/hoje_na_historia",
+                    },
+                ],
             ],
-        ],
-    };
+        };
 
-    if (events) {
-        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-        bot.sendMessage(chatId, message, {
-            parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
-        });
-    } else {
-        bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
-            parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
-        });
+        if (events) {
+            const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+            bot.sendMessage(chatId, message, {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+            });
+        } else {
+            bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+            });
+        }
+    } catch (error) {
+        console.error("Error sending historical events:", error.message);
     }
 }
 
 const manhaJob = new CronJob(
     "0 8 * * *",
     async function () {
-        const chatModels = await ChatModel.find({});
-        for (const chatModel of chatModels) {
-            const chatId = chatModel.chatId;
-            if (chatId !== groupId) {
-                sendHistoricalEventsGroup(chatId);
-                console.log(
-                    `Mensagem enviada com sucesso para os grupos ${chatId}`
-                );
+        try {
+            const chatModels = await ChatModel.find({});
+            for (const chatModel of chatModels) {
+                const chatId = chatModel.chatId;
+                if (chatId !== groupId) {
+                    sendHistoricalEventsGroup(chatId);
+                    console.log(
+                        `Mensagem enviada com sucesso para os grupos ${chatId}`
+                    );
+                }
             }
+        } catch (error) {
+            console.error("Error in morning job:", error.message);
         }
     },
     null,
@@ -332,18 +340,6 @@ const manhaJob = new CronJob(
 );
 
 manhaJob.start();
-
-bot.onText(/\/stats/, async (msg) => {
-    const chatId = msg.chat.id;
-    const numUsers = await UserModel.countDocuments();
-    const numChats = await ChatModel.countDocuments();
-
-    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
-    bot.sendMessage(chatId, message);
-});
-bot.on("polling_error", (error) => {
-    console.error(`Erro no bot de polling: ${error}`);
-});
 
 const channelId = process.env.channelId;
 
@@ -377,6 +373,88 @@ channelJob.start();
 exports.initHandler = () => {
     return bot;
 };
+
+async function sendHistoricalEventsUser(userId) {
+    const user = await UserModel.findOne({ user_id: userId });
+    const events = await getHistoricalEvents();
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [
+                {
+                    text: "📢 Canal Oficial",
+                    url: "https://t.me/hoje_na_historia",
+                },
+            ],
+        ],
+    };
+
+    if (events) {
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        try {
+            const sentMessage = await bot.sendMessage(userId, message, {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+            });
+
+            const messageId = sentMessage.message_id;
+
+            user.messageId = messageId;
+            await user.save();
+
+            console.log(`Mensagem enviada com sucesso para o usuário ${userId}`);
+        } catch (error) {
+            console.log(`Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`);
+            if (error.response && error.response.statusCode === 403) {
+                await UserModel.findOneAndUpdate({ user_id: userId }, { msg_private: false });
+                console.log(`O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`);
+            }
+        }
+    } else {
+        bot.sendMessage(userId, "<b>Não há eventos históricos para hoje.</b>", {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        });
+    }
+}
+
+const userJob = new CronJob(
+    "25 9 * * *",
+    async function () {
+        const users = await UserModel.find({ msg_private: true });
+        for (const user of users) {
+            const userId = user.user_id;
+            const messageId = user.messageId;
+
+            if (messageId) {
+                try {
+                    await bot.deleteMessage(userId, messageId);
+                    console.log(`Mensagem anterior do usuário ${userId} excluída com sucesso`);
+                } catch (error) {
+                    console.log(`Erro ao excluir mensagem anterior do usuário ${userId}: ${error.message}`);
+                }
+            }
+
+            await sendHistoricalEventsUser(userId);
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+userJob.start();
+
+bot.onText(/\/stats/, async (msg) => {
+    const chatId = msg.chat.id;
+    const numUsers = await UserModel.countDocuments();
+    const numChats = await ChatModel.countDocuments();
+
+    const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
+    bot.sendMessage(chatId, message);
+});
+bot.on("polling_error", (error) => {
+    console.error(`Erro no bot de polling: ${error}`);
+});
 
 function timeFormatter(seconds) {
     const hours = Math.floor(seconds / 3600);
@@ -633,76 +711,7 @@ const job = new CronJob(
     true,
     "America/Sao_Paulo"
 );
-async function sendHistoricalEventsUser(userId) {
-    const events = await getHistoricalEvents();
-    const inlineKeyboard = {
-        inline_keyboard: [
-            [
-                {
-                    text: "📢 Canal Oficial",
-                    url: "https://t.me/hoje_na_historia",
-                },
-            ],
-        ],
-    };
 
-    if (events) {
-        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-        try {
-            const sentMessage = await bot.sendMessage(userId, message, {
-                parse_mode: "HTML",
-                reply_markup: inlineKeyboard,
-            });
-
-            const messageId = sentMessage.message_id;
-
-            await UserModel.findOneAndUpdate(
-                { user_id: userId },
-                { messageId: messageId }
-            );
-
-            console.log(`Mensagem enviada com sucesso para o usuário ${userId}`);
-        } catch (error) {
-            console.log(`Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`);
-            if (error.response && error.response.statusCode === 403) {
-                await UserModel.findOneAndUpdate({ user_id: userId }, { msg_private: false });
-                console.log(`O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`);
-            }
-        }
-    } else {
-        bot.sendMessage(userId, "<b>Não há eventos históricos para hoje.</b>", {
-            parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
-        });
-    }
-}
-
-const userJob = new CronJob(
-    "56 10 * * *",
-    async function () {
-        const users = await UserModel.find({ msg_private: true });
-        for (const user of users) {
-            const userId = user.user_id;
-            const messageId = user.messageId;
-
-            if (messageId) {
-                try {
-                    await bot.deleteMessage(userId, messageId);
-                    console.log(`Mensagem anterior do usuário ${userId} excluída com sucesso`);
-                } catch (error) {
-                    console.log(`Erro ao excluir mensagem anterior do usuário ${userId}: ${error.message}`);
-                }
-            }
-
-            await sendHistoricalEventsUser(userId);
-        }
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-userJob.start();
 
 bot.onText(/\/sendoff/, async (msg) => {
     if (msg.chat.type !== "private") {
@@ -1208,3 +1217,158 @@ function getMonthName(month) {
     return monthNames[month - 1];
 }
 
+// async function getholidayOfTheDay() {
+//    const today = new Date();
+//    const day = today.getDate();
+//    const month = today.getMonth() + 1;
+
+//    try {
+//        var jsonEvents = require("./holidayBr.json");
+//        var births = jsonEvents[month + "-" + day]["births"]
+//        if (births.length > 0) {
+//            const messageParts = [];
+//            births.forEach((birth, index) => {
+//                const name = `${birth.name}`;
+//                const bullet = "•";
+//                const birthMessage = `<i>${bullet}</i> ${name}`;
+//                messageParts.push(birthMessage);
+//            });
+//
+//            let message = `<b>Data comemorativa do dia 🇧🇷</b> \n\n<b><i>${day} de ${getMonthName(month)}</i></b>\n\n`;
+//
+//            message += messageParts.join("\n");
+//
+//            await sendMessageToChannel(message);
+//        } else {
+//            console.log("Não há informações sobre nascidos hoje.");
+//        }
+//    } catch (error) {
+//        console.error("Erro ao obter informações:", error.message);
+//    }
+//}
+//
+//const holidaybr = new CronJob(
+//    "00 30 06 * * *",
+//    getholidayOfTheDay,
+//    null,
+//    true,
+//    "America/Sao_Paulo"
+//);
+//holidaybr.start();
+
+// async function sendHistoricalEventsChannelImage(channelId) {
+//    const today = new Date();
+//    const day = today.getDate();
+//    const month = today.getMonth() + 1;
+//
+//    try {
+//        const response = await axios.get(
+//            `https://pt.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
+//        );
+//        const events = response.data.events;
+//        const eventsWithPhoto = events.filter(
+//            (event) => event.pages && event.pages[0].thumbnail
+//        );
+//
+//        if (eventsWithPhoto.length === 0) {
+//            console.log("Não há eventos com fotos para enviar hoje.");
+//            return;
+//        }
+//
+//        const randomIndex = Math.floor(Math.random() * eventsWithPhoto.length);
+//        const event = eventsWithPhoto[randomIndex];
+//
+//        const caption = `<b>🖼 História ilustrada </b>\n\n<code>${event.text}</code>`;
+
+//        const options = {
+//            parse_mode: "HTML",
+//        };
+
+//        const photoUrl = event.pages[0].thumbnail.source;
+//        await bot.sendPhoto(channelId, photoUrl, {
+//            caption,
+//            ...options,
+//        });
+
+//        console.log(`Historical event sent successfully to channelId ${channelId}.`);
+//    } catch (error) {
+//        console.error("Failed to send historical event:", error);
+//    }
+//}
+
+//const imagechannel = new CronJob(
+//    "00 00 08 * * *",
+//    () => sendHistoricalEventsChannelImage(channelId),
+//    null,
+//    true,
+//    "America/Sao_Paulo"
+//);
+//imagechannel.start();
+
+
+
+//async function getCuriosidade() {
+//    const today = new Date();
+//    const day = today.getDate();
+//    const month = today.getMonth() + 1;
+//
+//    try {
+//        const jsonEvents = require("./curiosidade.json");
+//        const curiosidade = jsonEvents[`${month}-${day}`]?.curiosidade;
+//        if (curiosidade) {
+//            const info = curiosidade[0].texto;
+//
+//            //const info = curiosidade[1].texto1; (PARA 2025)
+//            let message = `<b>Curiosidades Históricas 📜</b>\n\n`;
+//            message += `${info}\n\n💬 Comente o que você achou abaixo;`;
+//            await sendMessageToChannel(message);
+//        } else {
+//            console.log("Não há informações para o dia de hoje.");
+//        }
+//    } catch (error) {
+//        console.error("Erro ao obter informações:", error.message);
+//    }
+//}
+
+//const curiosidade = new CronJob(
+//    "00 00 14 * * *",
+//    getCuriosidade,
+//    null,
+//    true,
+//    "America/Sao_Paulo"
+//);
+// curiosidade.start();
+
+
+//async function getFrase() {
+//    const today = new Date();
+//    const day = today.getDate();
+//    const month = today.getMonth() + 1;
+
+//    try {
+//        const jsonEvents = require("./frases.json");
+//        const frase = jsonEvents[`${month}-${day}`];
+//        if (frase) {
+//            const quote = frase.quote;
+//            const author = frase.author;
+//
+//            let message = `<b>💡 Citação para refletir</b>\n\n`;
+//            message += `"<i>${quote}"</i> - <b>${author}</b>\n\n`;
+//            message += `💬 Comente o que você achou abaixo;`;
+//            await sendMessageToChannel(message);
+//        } else {
+//            console.log("Não há informações para o dia de hoje.");
+//        }
+//    } catch (error) {
+//        console.error("Erro ao obter informações:", error.message);
+//    }
+//}
+
+//const frase = new CronJob(
+//    "00 59 19 * * *",
+//    getFrase,
+//    null,
+//    true,
+//    "America/Sao_Paulo"
+//);
+// frase.start();
