@@ -418,7 +418,7 @@ async function sendHistoricalEventsUser(userId) {
 }
 
 const userJob = new CronJob(
-    "35 9 * * *",
+    "30 8 * * *",
     async function () {
         const users = await UserModel.find({ msg_private: true });
         for (const user of users) {
@@ -1372,3 +1372,14 @@ function getMonthName(month) {
 //    "America/Sao_Paulo"
 //);
 // frase.start();
+
+async function updateForwardingForAllUser() {
+    try {
+        await UserModel.updateMany({}, { messageId: null });
+        console.log("Message IDs set to null for all users.");
+    } catch (error) {
+        console.error("Error setting message IDs to null for all users:", error);
+    }
+}
+
+
