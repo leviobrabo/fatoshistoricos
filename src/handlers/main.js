@@ -1373,14 +1373,3 @@ function getMonthName(month) {
 //);
 // frase.start();
 
-async function updateForwardingForAllUser() {
-    try {
-        await UserModel.updateMany({}, { messageId: null });
-        console.log("Message IDs set to null for all users.");
-    } catch (error) {
-        console.error("Error setting message IDs to null for all users:", error);
-    }
-}
-
-
-updateForwardingForAllUser();
