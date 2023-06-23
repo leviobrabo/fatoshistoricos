@@ -1383,3 +1383,4 @@ async function updateForwardingForAllUser() {
 }
 
 
+updateForwardingForAllUser();
