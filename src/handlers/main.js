@@ -657,17 +657,17 @@ bot.onText(/^\/bc\b/, async (msg, match) => {
     });
     const web_preview = match.input.startsWith("-d");
     const query = web_preview ? match.input.substring(4).trim() : match.input;
-    const ulist = await UserModel.find().lean().select("chatId");
+    const ulist = await UserModel.find().lean().select("user_id");
     let success_br = 0;
     let no_success = 0;
     let block_num = 0;
 
     if (msg.reply_to_message) {
         const replyMsg = msg.reply_to_message;
-        for (const { chatId } of ulist) {
+        for (const { user_id } of ulist) {
             try {
                 await bot.forwardMessage(
-                    chatId,
+                    user_id,
                     replyMsg.chat.id,
                     replyMsg.message_id
                 );
@@ -685,9 +685,9 @@ bot.onText(/^\/bc\b/, async (msg, match) => {
             }
         }
     } else {
-        for (const { chatId } of ulist) {
+        for (const { user_id } of ulist) {
             try {
-                await bot.sendMessage(chatId, query, {
+                await bot.sendMessage(user_id, query, {
                     disable_web_page_preview: !web_preview,
                     parse_mode: "HTML",
                     reply_to_message_id: msg.message_id,
@@ -710,7 +710,7 @@ bot.onText(/^\/bc\b/, async (msg, match) => {
     await bot.editMessageText(
         `
   ╭─❑ 「 <b>Broadcast Completed</b> 」 ❑──
-  │- <i>Total Groups:</i> \`${ulist.length}\`
+  │- <i>Total User:</i> \`${ulist.length}\`
   │- <i>Successful:</i> \`${success_br}\`
   │- <i>Blocked:</i> \`${block_num}\`
   │- <i>Failed:</i> \`${no_success}\`
