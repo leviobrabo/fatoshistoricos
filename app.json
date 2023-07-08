@@ -3,7 +3,11 @@
     "description": "'Fatos Históricos' é um Bot que envia fatos históricos de cada dia do mês",
     "repository": "https://github.com/leviobrabo/fatoshistoricos",
     "logo": "https://i.imgur.com/XXxV74z.jpeg",
-    "keywords": ["node", "fatos_históricos", "telegrambot"],
+    "keywords": [
+        "node",
+        "fatos_históricos",
+        "telegrambot"
+    ],
     "website": "https://github.com/leviobrabo/fatoshistoricos",
     "success_url": "https://t.me/fatoshistbot",
     "env": {
@@ -27,8 +31,13 @@
             "value": "",
             "required": true
         },
-        "DEV_USERS": {
-            "description": "Developers id ",
+        "channelStatusId": {
+            "description": "Channel ID post Telegram Status.",
+            "value": "",
+            "required": true
+        },
+        "ownerId": {
+            "description": "owner id Telegram",
             "value": "",
             "required": true
         }

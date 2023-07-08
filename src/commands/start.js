@@ -4,7 +4,7 @@ function startCommand(bot, message) {
     }
     const firstName = message.from.first_name;
 
-    const message_start = `Olá, <b>${firstName}</b>! \n\nEu sou <b>Fatos Históricos</b>, sou um bot que envia diáriamente mensagem com acontecimentos históricos acontecido no dia do envio da mensagem.\n\nO envio da mensagem no chat privado é automático, se optar por não receber, digite /sendoff e se quiser voltar a receber digite /sendon\n\n<b>A mensagem é enviada todos os dias às 8 horas</b>\n\nAdicione-me em seu grupo para receber as mensagem lá.\n\n<b>Comandos:</b> /help\n\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
+    const message_start = `Olá, <b>${firstName}</b>!\n\nEu sou <b>Fatos Históricos</b>, sou um bot que envia diariamente mensagens com acontecimentos históricos que ocorreram no dia do envio da mensagem.\n\nO envio da mensagem no chat privado é automático. Se você desejar parar de receber, digite /sendoff. Se quiser voltar a receber, digite /sendon\n\n<b>A mensagem é enviada todos os dias às 8 horas</b>\n\nAdicione-me em seu grupo para receber as mensagens lá.\n\n<b>Comandos:</b> /help\n\n📦<b>Meu código-fonte:</b> <a href="https://github.com/leviobrabo/fatoshistoricos">GitHub</a>`;
     const options_start = {
         parse_mode: "HTML",
         disable_web_page_preview: true,
@@ -18,8 +18,8 @@ function startCommand(bot, message) {
                 ],
                 [
                     {
-                        text: "👾 Canal de figurinhas",
-                        url: "https://t.me/lbrabo",
+                        text: "⚙️ Atualizações do bot",
+                        url: "https://t.me/updatehist",
                     },
                     {
                         text: "💰 Fazer uma doação",
@@ -43,7 +43,7 @@ function startCommand(bot, message) {
         const messageId = callbackQuery.message.message_id;
 
         if (callbackQuery.data === "donate") {
-            const resposta_donate = `Olá, ${firstName}! \n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: <code>32dc79d2-2868-4ef0-a277-2c10725341d4</code>\nBanco: Picpay\nNome: Luzia\n\nObrigado pela sua contribuição! 🙌\n\n<b>BTC:</b> <code>bc1qjxzlug0cwnfjrhacy9kkpdzxfj0mcxc079axtl</code>\n<b>ETH/USDT:</b> <code>0x1fbde0d2a96869299049f4f6f78fbd789d167d1b</code>`;
+            const resposta_donate = `Olá, ${firstName}!\n\nContribua com qualquer valor para ajudar a manter o servidor do bot online e com mais recursos! Sua ajuda é fundamental para mantermos o bot funcionando de forma eficiente e com novas funcionalidades. \n\nPara fazer uma doação, utilize a chave PIX a seguir: \nPix: <code>32dc79d2-2868-4ef0-a277-2c10725341d4</code>\nBanco: Picpay\nNome: Luzia\n\nObrigado pela sua contribuição! 🙌\n\n<b>BTC:</b> <code>bc1qjxzlug0cwnfjrhacy9kkpdzxfj0mcxc079axtl</code>\n<b>ETH/USDT:</b> <code>0x1fbde0d2a96869299049f4f6f78fbd789d167d1b</code>`;
 
             await bot.editMessageText(resposta_donate, {
                 parse_mode: "HTML",
