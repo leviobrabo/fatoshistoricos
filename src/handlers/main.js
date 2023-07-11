@@ -315,7 +315,11 @@ bot.on("new_chat_members", async (msg) => {
                             ],
                         },
                     }
-                );
+                ).catch((error) => {
+                    console.error(
+                        `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
+                    );
+                });
             }
         }
 
@@ -400,11 +404,15 @@ async function sendHistoricalEventsGroup(chatId) {
             bot.sendMessage(chatId, message, {
                 parse_mode: "HTML",
                 reply_markup: inlineKeyboard,
+            }).catch(error => {
+                console.error("Error sending message:", error.message);
             });
         } else {
             bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
                 parse_mode: "HTML",
                 reply_markup: inlineKeyboard,
+            }).catch(error => {
+                console.error("Error sending message:", error.message);
             });
         }
     } catch (error) {
@@ -420,10 +428,17 @@ const manhaJob = new CronJob(
             for (const chatModel of chatModels) {
                 const chatId = chatModel.chatId;
                 if (chatId !== groupId) {
-                    sendHistoricalEventsGroup(chatId);
-                    console.log(
-                        `Mensagem enviada com sucesso para os grupos ${chatId}`
-                    );
+                    try {
+                        sendHistoricalEventsGroup(chatId);
+                        console.log(
+                            `Mensagem enviada com sucesso para o grupo ${chatId}`
+                        );
+                    } catch (error) {
+                        console.error(
+                            `Error sending historical events to group ${chatId}:`,
+                            error.message
+                        );
+                    }
                 }
             }
         } catch (error) {
@@ -436,6 +451,7 @@ const manhaJob = new CronJob(
 );
 
 manhaJob.start();
+
 
 
 async function sendHistoricalEventsChannel(channelId) {
@@ -545,10 +561,16 @@ bot.onText(/\/stats/, async (msg) => {
     const numChats = await ChatModel.countDocuments();
 
     const message = `\n──❑ 「 Bot Stats 」 ❑──\n\n ☆ ${numUsers} usuários\n ☆ ${numChats} chats`;
-    bot.sendMessage(chatId, message);
-});
-bot.on("polling_error", (error) => {
-    console.error(`Erro no bot de polling: ${error}`);
+
+    try {
+        await bot.sendMessage(chatId, message);
+    } catch (error) {
+        if (error.code === "ETELEGRAM" && error.response?.statusCode === 400) {
+            console.error(`Error sending message to chat ${chatId}: not enough rights to send text messages to the chat`);
+        } else {
+            console.error("Error sending message:", error);
+        }
+    }
 });
 
 function timeFormatter(seconds) {
@@ -825,11 +847,7 @@ bot.onText(/\/devs/, async (message) => {
     }
 
     if (message.chat.type !== "private" || chatId !== userId) {
-        bot.sendMessage(
-            chatId,
-            "Este comando só pode ser usado em um chat privado com o bot!"
-        );
-        return;
+        console.log("comando só pode ser usado no privado")
     }
 
     try {
@@ -857,10 +875,7 @@ bot.onText(/\/ban/, async (message) => {
     const chatId = message.text.split(" ")[1];
 
     if (message.chat.type !== "private") {
-        await bot.sendMessage(
-            message.chat.id,
-            "Por favor, envie este comando em um chat privado com o bot."
-        );
+        console.log("mensagem de ban só no privado do bot")
         return;
     }
 
@@ -906,9 +921,15 @@ bot.onText(/\/ban/, async (message) => {
         }
     );
 
-    await ChatModel.updateOne({ chatId: chatId }, { $set: { isBlocked: true } });
-    await bot.sendMessage(chatId, `Toguro sairá do grupo e não pode ficar!!`);
+    try {
+        await ChatModel.updateOne({ chatId: chatId }, { $set: { isBlocked: true } });
+        await bot.sendMessage(chatId, `Toguro sairá do grupo e não pode ficar!!`);
+    } catch (error) {
+        console.error("Error sending message:", error);
+    }
     await bot.leaveChat(chatId);
+
+
 
     await bot.sendMessage(
         message.chat.id,
@@ -1233,14 +1254,14 @@ bot.onText(/\/sendgp/, async (msg, match) => {
                 });
                 success_br += 1;
             } catch (err) {
-                if (
-                    err.response &&
-                    err.response.body &&
-                    err.response.body.error_code === 403
-                ) {
+                if (err.code === "ETELEGRAM" && err.response?.statusCode === 400) {
+                    console.error(
+                        `Error sending message to chat ${chatId}: not enough rights to send text messages to the chat`
+                    );
                     block_num += 1;
                 } else {
                     no_success += 1;
+                    console.error("Error sending message:", err);
                 }
             }
         }
@@ -1587,7 +1608,13 @@ async function sendHistoricalEventsGroupImage(chatId) {
 
         console.log(`Historical event sent successfully to chatID ${chatId}.`);
     } catch (error) {
-        console.error("Failed to send historical event:", error);
+        if (error.code === "ETELEGRAM" && error.response?.statusCode === 400) {
+            console.error(
+                `Error sending historical event to chat ${chatId}: not enough rights to send text messages to the chat`
+            );
+        } else {
+            console.error("Failed to send historical event:", error);
+        }
     }
 }
 
@@ -1598,8 +1625,12 @@ const tardJob = new CronJob(
         for (const chatModel of chatModels) {
             const chatId = chatModel.chatId;
             if (chatId !== groupId) {
-                sendHistoricalEventsGroupImage(chatId);
-                console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
+                try {
+                    await sendHistoricalEventsGroupImage(chatId);
+                    console.log(`Mensagem enviada com sucesso para o chatID ${chatId}`);
+                } catch (error) {
+                    console.error(`Error sending historical events to chat ${chatId}:`, error);
+                }
             }
         }
     },
@@ -1607,6 +1638,7 @@ const tardJob = new CronJob(
     true,
     "America/Sao_Paulo"
 );
+
 
 tardJob.start();
 
