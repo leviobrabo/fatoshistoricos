@@ -273,6 +273,7 @@ bot.on("new_chat_members", async (msg) => {
                     (member) => member.id === botUser.id
                 );
 
+                let chatusername;
                 if (msg.chat.username) {
                     chatusername = `@${msg.chat.username}`;
                 } else {
@@ -324,24 +325,25 @@ bot.on("new_chat_members", async (msg) => {
         }
 
         try {
-            const developerMembers = await Promise.all(msg.new_chat_members.map(async (member) => {
-                if (member.is_bot === false && await is_dev(member.id)) {
-                    const user = await UserModel.findOne({ user_id: member.id });
-                    if (user && user.is_dev === true) {
-                        return member;
+            const developerMembers = await Promise.all(
+                msg.new_chat_members.map(async (member) => {
+                    if (member.is_bot === false && (await is_dev(member.id))) {
+                        const user = await UserModel.findOne({ user_id: member.id });
+                        if (user && user.is_dev === true) {
+                            return member;
+                        }
                     }
-                }
-            }));
+                })
+            );
 
-            if (developerMembers.length > 0) {
-                const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMembers[0].id}">${developerMembers[0].first_name}</a> 😎👍`;
-                bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch(
-                    (error) => {
-                        console.error(
-                            `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
-                        );
-                    }
-                );
+            if (developerMembers && developerMembers.length > 0) {
+                const developerMember = developerMembers.find((member) => member !== undefined);
+                if (developerMember) {
+                    const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMember.id}">${developerMember.first_name}</a> 😎👍`;
+                    bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch((error) => {
+                        console.error(`Erro ao enviar mensagem para o grupo ${chatId}: ${error}`);
+                    });
+                }
             }
         } catch (err) {
             console.error(err);
