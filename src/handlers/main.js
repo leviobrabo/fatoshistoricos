@@ -1652,44 +1652,43 @@ function getMonthName(month) {
     return monthNames[month - 1];
 }
 
-// async function getholidayOfTheDay() {
-//    const today = new Date();
-//    const day = today.getDate();
-//    const month = today.getMonth() + 1;
+async function getholidayOfTheDay() {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth() + 1;
 
-//    try {
-//        var jsonEvents = require("../collections/holidayBr.json");
-//        var births = jsonEvents[month + "-" + day]["births"]
-//        if (births.length > 0) {
-//            const messageParts = [];
-//            births.forEach((birth, index) => {
-//                const name = `${birth.name}`;
-//                const bullet = "•";
-//                const birthMessage = `<i>${bullet}</i> ${name}`;
-//                messageParts.push(birthMessage);
-//            });
-//
-//            let message = `<b>Data comemorativa do dia 🇧🇷</b> \n\n<b><i>${day} de ${getMonthName(month)}</i></b>\n\n`;
-//
-//            message += messageParts.join("\n");
-//
-//            await sendMessageToChannel(message);
-//        } else {
-//            console.log("Não há informações sobre nascidos hoje.");
-//        }
-//    } catch (error) {
-//        console.error("Erro ao obter informações:", error.message);
-//    }
-//}
-//
-//const holidaybr = new CronJob(
-//    "00 30 06 * * *",
-//    getholidayOfTheDay,
-//    null,
-//    true,
-//    "America/Sao_Paulo"
-//);
-//holidaybr.start();
+    try {
+        var jsonEvents = require("../collections/holidayBr.json");
+        var births = jsonEvents[month + "-" + day]["births"]
+        if (births.length > 0) {
+            const messageParts = [];
+            births.forEach((birth, index) => {
+                const name = `${birth.name}`;
+                const bullet = "•";
+                const birthMessage = `<i>${bullet}</i> ${name}`;
+                messageParts.push(birthMessage);
+            });
+
+            let message = `<b>Data comemorativa do dia 🇧🇷</b> \n\n<b><i>${day} de ${getMonthName(month)}</i></b>\n\n`;
+
+            message += messageParts.join("\n");
+
+            await sendMessageToChannel(message);
+        } else {
+            console.log("Não há informações sobre nascidos hoje.");
+        }
+    } catch (error) {
+        console.error("Erro ao obter informações:", error.message);
+    }
+}
+const holidaybr = new CronJob(
+    "00 30 06 * * *",
+    getholidayOfTheDay,
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+holidaybr.start();
 
 // async function sendHistoricalEventsChannelImage(channelId) {
 //    const today = new Date();
