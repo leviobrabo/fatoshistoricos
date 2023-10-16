@@ -37,6 +37,8 @@ function helpCommand(bot, message) {
                 "/sendoff - Não receberá às 8 horas a mensagem diária",
                 "/fwdoff - desativa o encaminhamento no grupo",
                 "/fwdon - ativa o encaminhamento no grupo",
+                "/settopic - definir um chat como tópico para receber as mensagens diárias",
+                "/cleartopic - remove um chat como tópico para receber as mensagens diárias (retorna para o General)",
             ];
             await bot.editMessageText(
                 "<b>Lista de Comandos:</b> \n\n" + commands.join("\n"),

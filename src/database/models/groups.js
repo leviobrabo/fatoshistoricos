@@ -20,6 +20,10 @@ const ChatSchema = new Schema({
         required: true,
         default: true,
     },
+    thread_id: {
+        type: Number,
+        required: false,
+    }
 });
 
 module.exports = ChatSchema;

@@ -387,8 +387,81 @@ async function getHistoricalEvents() {
     return eventText;
 }
 
+bot.onText(/\/settopic/, async (msg) => {
+    if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') {
+        await bot.sendMessage(msg.chat.id, 'Esse comando só pode ser enviado em grupos.');
+        return;
+    }
+
+    const chatId = msg.chat.id;
+    const threadId = msg.reply_to_message?.message_thread_id;
+    const chatMember = await bot.getChatMember(chatId, msg.from.id);
+
+    if (chatMember.status !== 'administrator' && chatMember.status !== 'creator') {
+        return;
+    }
+
+    try {
+        const chat = await ChatModel.findOne({ chatId });
+
+        if (chat) {
+            if (threadId === "1" || !threadId) {
+                chat.thread_id = null;
+                await chat.save();
+                bot.sendMessage(chatId, "Será enviado as mensagens aqui!", { message_thread_id: chat.thread_id });
+            } else if (chat.thread_id === threadId) {
+                bot.sendMessage(chatId, `Este chat já está definido para receber mensagens do tópico ${threadId}.`, { message_thread_id: chat.thread_id });
+            } else {
+                chat.thread_id = threadId;
+                await chat.save();
+                bot.sendMessage(chatId, `Thread ID atualizado para: ${threadId}, agora você receberá as mensagens históricas aqui!`, { message_thread_id: threadId });
+            }
+        } else {
+            const newChat = new ChatModel({ chatId, thread_id: threadId });
+            await newChat.save();
+            bot.sendMessage(chatId, `Thread ID definido como: ${threadId}, agora você receberá as mensagens históricas aqui!`, { message_thread_id: threadId });
+        }
+    } catch (error) {
+        console.error("Error setting thread ID:", error.message);
+    }
+});
+
+bot.onText(/\/cleartopic/, async (msg) => {
+    if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') {
+        await bot.sendMessage(msg.chat.id, 'Esse comando só pode ser enviado em grupos.');
+        return;
+    }
+
+    const chatId = msg.chat.id;
+    const chatMember = await bot.getChatMember(chatId, msg.from.id);
+
+    if (chatMember.status !== 'administrator' && chatMember.status !== 'creator') {
+        return;
+    }
+
+    try {
+        const chat = await ChatModel.findOne({ chatId });
+
+        if (chat) {
+            chat.thread_id = null;
+            await chat.save();
+            bot.sendMessage(chatId, "O tópico foi removido com sucesso. Você não receberá mais mensagens históricas aqui.");
+        } else {
+            bot.sendMessage(chatId, "Você ainda não definiu um tópico. Use o comando /settopic para definir um tópico.");
+        }
+    } catch (error) {
+        console.error("Error clearing thread ID:", error.message);
+    }
+});
+
+
+
+
+
 async function sendHistoricalEventsGroup(chatId) {
     try {
+        const chat = await ChatModel.findOne({ chatId });
+        const topic = chat.thread_id;
         const events = await getHistoricalEvents();
         const inlineKeyboard = {
             inline_keyboard: [
@@ -406,6 +479,7 @@ async function sendHistoricalEventsGroup(chatId) {
             bot.sendMessage(chatId, message, {
                 parse_mode: "HTML",
                 reply_markup: inlineKeyboard,
+                message_thread_id: topic,
             }).catch(error => {
                 console.error("Error sending message:", error.message);
             });
@@ -413,6 +487,7 @@ async function sendHistoricalEventsGroup(chatId) {
             bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
                 parse_mode: "HTML",
                 reply_markup: inlineKeyboard,
+                message_thread_id: topic,
             }).catch(error => {
                 console.error("Error sending message:", error.message);
             });
@@ -423,7 +498,7 @@ async function sendHistoricalEventsGroup(chatId) {
 }
 
 const manhaJob = new CronJob(
-    "0 8 * * *",
+    "00 08 * * *",
     async function () {
         try {
             const chatModels = await ChatModel.find({});
@@ -945,8 +1020,7 @@ bot.onText(/\/unban/, async (message) => {
 
     if (message.chat.type !== "private") {
         await bot.sendMessage(
-            message.chat.id,
-            "Por favor, envie este comando em um chat privado com o bot."
+            console.log("Por favor, envie este comando em um chat privado com o bot.")
         );
         return;
     }
@@ -1009,8 +1083,7 @@ bot.onText(/\/banned/, async (message) => {
 
     if (message.chat.type !== "private") {
         await bot.sendMessage(
-            message.chat.id,
-            "Por favor, envie este comando em um chat privado com o bot."
+            console.log("Por favor, envie este comando em um chat privado com o bot.")
         );
         return;
     }
@@ -1220,6 +1293,7 @@ bot.onText(/\/sendgp/, async (msg, match) => {
     const ulist = await ChatModel.find({ forwarding: true })
         .lean()
         .select("chatId");
+
     let success_br = 0;
     let no_success = 0;
     let block_num = 0;
@@ -1228,12 +1302,18 @@ bot.onText(/\/sendgp/, async (msg, match) => {
         const replyMsg = msg.reply_to_message;
         for (const { chatId } of ulist) {
             try {
-                await bot.forwardMessage(
-                    chatId,
-                    replyMsg.chat.id,
-                    replyMsg.message_id
-                );
-                success_br += 1;
+                // Find the thread_id from the database for this chat
+                const chatModel = await ChatModel.findOne({ chatId });
+                if (chatModel) {
+                    const { thread_id } = chatModel;
+                    await bot.forwardMessage(
+                        chatId,
+                        replyMsg.chat.id,
+                        replyMsg.message_id,
+                        { message_thread_id: thread_id }
+                    );
+                    success_br += 1;
+                }
             } catch (err) {
                 if (
                     err.response &&
@@ -1249,12 +1329,18 @@ bot.onText(/\/sendgp/, async (msg, match) => {
     } else {
         for (const { chatId } of ulist) {
             try {
-                await bot.sendMessage(chatId, query, {
-                    disable_web_page_preview: !web_preview,
-                    parse_mode: "HTML",
-                    reply_to_message_id: msg.message_id,
-                });
-                success_br += 1;
+                // Find the thread_id from the database for this chat
+                const chatModel = await ChatModel.findOne({ chatId });
+                if (chatModel) {
+                    const { thread_id } = chatModel;
+                    await bot.sendMessage(chatId, query, {
+                        disable_web_page_preview: !web_preview,
+                        parse_mode: "HTML",
+                        reply_to_message_id: msg.message_id,
+                        message_thread_id: thread_id
+                    });
+                    success_br += 1;
+                }
             } catch (err) {
                 if (err.code === "ETELEGRAM" && err.response?.statusCode === 400) {
                     console.error(
@@ -1285,6 +1371,8 @@ bot.onText(/\/sendgp/, async (msg, match) => {
         }
     );
 });
+
+
 
 bot.onText(/\/fwdoff/, async (msg) => {
     if (msg.chat.type !== "group" && msg.chat.type !== "supergroup") {
