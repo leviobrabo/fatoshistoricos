@@ -1019,8 +1019,7 @@ bot.onText(/\/unban/, async (message) => {
     const chatId = message.text.split(" ")[1];
 
     if (message.chat.type !== "private") {
-            console.log("Por favor, envie este comando em um chat privado com o bot.")
-        );
+        console.log("Por favor, envie este comando em um chat privado com o bot.")
         return;
     }
 
@@ -1081,8 +1080,7 @@ bot.onText(/\/banned/, async (message) => {
     const userId = message.from.id;
 
     if (message.chat.type !== "private") {
-            console.log("Por favor, envie este comando em um chat privado com o bot.")
-        );
+        console.log("Por favor, envie este comando em um chat privado com o bot.")
         return;
     }
 
