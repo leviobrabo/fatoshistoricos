@@ -24,7 +24,7 @@ const chatCommands = [
 bot.setMyCommands(chatCommands, { escopo: JSON.stringify({ tipo: 'all_private_chats' }) });
 
 const groupCommands = [
-    { comando: '', descrição: '' },
+    { comando: 'help', descrição: 'Mais informações e lista de comandos' },
 ];
 
 bot.setMyCommands(groupCommands, { escopo: JSON.stringify({ tipo: 'all_group_chats' }) });
