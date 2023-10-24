@@ -15,6 +15,27 @@ const channelStatusId = process.env.channelStatusId;
 const groupId = process.env.groupId;
 const owner = process.env.ownerId
 
+const chatCommands = [
+    { comando: 'help', descrição: 'Mais informações e lista de comandos' },
+    { comando: 'fotoshist', descrição: 'Fotos históricas' },
+    { comando: 'sendoff', descrição: 'Desabilita envio de mensagens de fatos históricos em privado' },
+    { comando: 'sendon', descrição: 'Ativa o envio de mensagens de fatos históricos em privado' },
+];
+bot.setMyCommands(chatCommands, { escopo: JSON.stringify({ tipo: 'all_private_chats' }) });
+
+const groupCommands = [
+    { comando: '', descrição: '' },
+];
+
+bot.setMyCommands(groupCommands, { escopo: JSON.stringify({ tipo: 'all_group_chats' }) });
+
+const adminCommands = [
+    { comando: 'fwdon', descrição: 'Receber indicação no grupo' },
+    { comando: 'fwdoff', descrição: 'Não receber encaminhamento no grupo' },
+];
+
+bot.setMyCommands(adminCommands, { escopo: JSON.stringify({ tipo: 'all_chat_administrators' }) });
+
 bot.onText(/^\/start$/, (message) => {
     startCommand(bot, message);
 });
@@ -27,7 +48,6 @@ bot.onText(/^\/help/, (message) => {
     helpCommand(bot, message);
 });
 
-// Função para verificar se o usuário tem is_dev: true
 async function is_dev(user_id) {
     try {
         const user = await UserModel.findOne({ user_id: user_id });
@@ -1298,7 +1318,6 @@ bot.onText(/\/sendgp/, async (msg, match) => {
         const replyMsg = msg.reply_to_message;
         for (const { chatId } of ulist) {
             try {
-                // Find the thread_id from the database for this chat
                 const chatModel = await ChatModel.findOne({ chatId });
                 if (chatModel) {
                     const { thread_id } = chatModel;
@@ -1325,7 +1344,6 @@ bot.onText(/\/sendgp/, async (msg, match) => {
     } else {
         for (const { chatId } of ulist) {
             try {
-                // Find the thread_id from the database for this chat
                 const chatModel = await ChatModel.findOne({ chatId });
                 if (chatModel) {
                     const { thread_id } = chatModel;
@@ -1773,6 +1791,9 @@ const holidaybr = new CronJob(
     "America/Sao_Paulo"
 );
 holidaybr.start();
+
+
+// NOVIDADE 2024
 
 // async function sendHistoricalEventsChannelImage(channelId) {
 //    const today = new Date();
