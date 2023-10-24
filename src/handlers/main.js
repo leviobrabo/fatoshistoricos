@@ -16,22 +16,22 @@ const groupId = process.env.groupId;
 const owner = process.env.ownerId
 
 const chatCommands = [
-    { comando: 'help', descrição: 'Mais informações e lista de comandos' },
-    { comando: 'fotoshist', descrição: 'Fotos históricas' },
-    { comando: 'sendoff', descrição: 'Desabilita envio de mensagens de fatos históricos em privado' },
-    { comando: 'sendon', descrição: 'Ativa o envio de mensagens de fatos históricos em privado' },
+    { comand: 'help', description: 'Mais informações e lista de comandos' },
+    { comand: 'fotoshist', description: 'Fotos históricas' },
+    { comand: 'sendoff', description: 'Desabilita envio de mensagens de fatos históricos em privado' },
+    { comand: 'sendon', description: 'Ativa o envio de mensagens de fatos históricos em privado' },
 ];
 bot.setMyCommands(chatCommands, { scope: JSON.stringify({ type: 'all_private_chats' }) });
 
 const groupCommands = [
-    { comando: 'help', descrição: 'Mais informações e lista de comandos' },
+    { comand: 'help', description: 'Mais informações e lista de comandos' },
 ];
 
 bot.setMyCommands(groupCommands, { scope: JSON.stringify({ type: 'all_group_chats' }) });
 
 const adminCommands = [
-    { comando: 'fwdon', descrição: 'Receber indicação no grupo' },
-    { comando: 'fwdoff', descrição: 'Não receber encaminhamento no grupo' },
+    { comand: 'fwdon', description: 'Receber indicação no grupo' },
+    { comand: 'fwdoff', description: 'Não receber encaminhamento no grupo' },
 ];
 
 bot.setMyCommands(adminCommands, { scope: JSON.stringify({ type: 'all_chat_administrators' }) });
