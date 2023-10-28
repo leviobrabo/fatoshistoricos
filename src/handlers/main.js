@@ -1690,6 +1690,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
             `https://pt.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
         );
         const events = response.data.events;
+        const topic = chat.thread_id;
         const randomIndex = Math.floor(Math.random() * events.length);
         const event = events[randomIndex];
 
@@ -1698,6 +1699,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
         const options = {
             parse_mode: "HTML",
             reply_markup: inlineKeyboard,
+            message_thread_id: topic,
         };
 
         if (event.pages && event.pages[0].thumbnail) {
