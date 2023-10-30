@@ -1690,15 +1690,13 @@ async function sendHistoricalEventsGroupImage(chatId) {
             `https://pt.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
         );
         const events = response.data.events;
-        const topic = chat.thread_id;
+
         const randomIndex = Math.floor(Math.random() * events.length);
         const event = events[randomIndex];
+        const chat = await ChatModel.findOne({ chatId });
+        const topic = chat.thread_id;
 
         const caption = `<b>Você sabia?</b>\n\n<code>${event.text}</code>`;
-
-        const options = {
-
-        };
 
         if (event.pages && event.pages[0].thumbnail) {
             const photoUrl = event.pages[0].thumbnail.source;
@@ -1725,7 +1723,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
 }
 
 const tardJob = new CronJob(
-    "40 19 * * *",
+    "46 19 * * *",
     async function () {
         const chatModels = await ChatModel.find({ forwarding: true });
         for (const chatModel of chatModels) {
