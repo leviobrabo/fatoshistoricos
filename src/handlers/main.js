@@ -1723,7 +1723,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
 }
 
 const tardJob = new CronJob(
-    "46 19 * * *",
+    "00 15 * * *",
     async function () {
         const chatModels = await ChatModel.find({ forwarding: true });
         for (const chatModel of chatModels) {
