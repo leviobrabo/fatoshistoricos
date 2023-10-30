@@ -1697,19 +1697,19 @@ async function sendHistoricalEventsGroupImage(chatId) {
         const caption = `<b>Você sabia?</b>\n\n<code>${event.text}</code>`;
 
         const options = {
-            parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
-            message_thread_id: topic,
+
         };
 
         if (event.pages && event.pages[0].thumbnail) {
             const photoUrl = event.pages[0].thumbnail.source;
             await bot.sendPhoto(chatId, photoUrl, {
                 caption,
-                ...options,
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+                message_thread_id: topic,
             });
         } else {
-            await bot.sendMessage(chatId, caption, options);
+            await bot.sendMessage(chatId, caption, { parse_mode: "HTML", reply_markup: inlineKeyboard, message_thread_id: topic, });
         }
 
         console.log(`Historical event sent successfully to chatID ${chatId}.`);
@@ -1725,7 +1725,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
 }
 
 const tardJob = new CronJob(
-    "0 15 * * *",
+    "40 19 * * *",
     async function () {
         const chatModels = await ChatModel.find({ forwarding: true });
         for (const chatModel of chatModels) {
