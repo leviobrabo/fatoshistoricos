@@ -1913,13 +1913,13 @@ holidaybr.start();
 // frase.start();
 
 function sendBotOnlineMessage() {
-    console.log(`Toguro iniciado com sucesso...`);
-    bot.sendMessage(groupId, `#Toguro #ONLINE\n\nBot is now playing ...`);
+    console.log(`Fatoshistbot iniciado com sucesso...`);
+    bot.sendMessage(groupId, `#Fatoshistbot #ONLINE\n\nBot is now playing ...`);
 }
 
 function sendBotOfflineMessage() {
-    console.log(`Toguro encerrado com sucesso...`);
-    bot.sendMessage(groupId, `#Toguro #OFFLINE\n\nBot is now off ...`)
+    console.log(`Fatoshistbot encerrado com sucesso...`);
+    bot.sendMessage(groupId, `#Fatoshistbot #OFFLINE\n\nBot is now off ...`)
         .then(() => {
             process.exit(0); // Encerra o processo do bot após enviar a mensagem offline
         })
