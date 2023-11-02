@@ -267,7 +267,7 @@ bot.on("new_chat_members", async (msg) => {
     const chatName = msg.chat.title;
 
     try {
-        if (chatId === groupId) {
+        if (chatId === parseFloat(groupId)) {
             console.log(
                 `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
             );
