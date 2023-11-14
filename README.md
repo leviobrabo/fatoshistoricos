@@ -40,8 +40,8 @@ DB_STRING=#URL de conexão com o MongoDB
 TELEGRAM_API=#Token do seu bot gerado no @BotFather
 groupId=#ID GROUP LOG
 channelId=#ID CHANNEL POST
-DEV_USERS=#ID_DEV // userId1,userId2,userId3
-
+ownerId‎=#ID_DEV // userId1,userId2,userId3
+channelStatusId‎=ID CANAL DE STATUS
 # Execute a aplicação
 $ npm start
 
