@@ -4,7 +4,7 @@
 
 [![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
 [![](https://img.shields.io/badge/Suporte-@kylorensbot-1b2069)](https://t.me/kylorensbot)
-[![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/hoje_na_historia)
+[![](https://img.shields.io/badge/Telegram-@HojeNaHistoria-red)](https://t.me/hoje_na_historia)
 [![](https://i.imgur.com/MzZuN3G.jpeg)](#)
 
 ### Pré-requisitos

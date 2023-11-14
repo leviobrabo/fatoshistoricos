@@ -3,8 +3,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const CronJob = require("cron").CronJob;
 
-const { ChatModel } = require("../database");
-const { UserModel } = require("../database");
+const { ChatModel, UserModel } = require("../database");
 
 const { startCommand } = require("../commands/start");
 const { histimag } = require("../commands/histimag");
@@ -36,17 +35,6 @@ const adminCommands = [
 
 bot.setMyCommands(adminCommands, { scope: JSON.stringify({ type: 'all_chat_administrators' }) });
 
-bot.onText(/^\/start$/, (message) => {
-    startCommand(bot, message);
-});
-
-bot.onText(/^\/fotoshist/, async (message) => {
-    await histimag(bot, message);
-});
-
-bot.onText(/^\/help/, (message) => {
-    helpCommand(bot, message);
-});
 
 async function is_dev(user_id) {
     try {
@@ -60,6 +48,65 @@ async function is_dev(user_id) {
         return false;
     }
 }
+
+function getMonthName(month) {
+    const monthNames = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+    ];
+    return monthNames[month - 1];
+}
+
+async function sendStatus() {
+    const start = new Date();
+    const replied = await bot.sendMessage(channelStatusId, "Bot is ON");
+    const end = new Date();
+    const m_s = end - start;
+    const uptime = process.uptime();
+    const uptime_formatted = timeFormatter(uptime);
+    const numUsers = await UserModel.countDocuments();
+    const numChats = await ChatModel.countDocuments();
+    await bot.editMessageText(
+        `#Fatoshistbot #Status\n\nStatus: ON\nPing: \`${m_s}ms\`\nUptime: \`${uptime_formatted}\`\nUsers: \`${numUsers}\`\nChats: \`${numChats}\``,
+        {
+            chat_id: replied.chat.id,
+            message_id: replied.message_id,
+            parse_mode: "Markdown",
+        }
+    );
+}
+
+function timeFormatter(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const hoursFormatted = String(hours).padStart(2, "0");
+    const minutesFormatted = String(minutes).padStart(2, "0");
+    const secondsFormatted = String(secs).padStart(2, "0");
+
+    return `${hoursFormatted}:${minutesFormatted}:${secondsFormatted}`;
+}
+
+const job = new CronJob(
+    "03 00 12 * * *",
+    sendStatus,
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+bot.onText(/^\/start$/, (message) => {
+    startCommand(bot, message);
+});
+
+bot.onText(/^\/fotoshist/, async (message) => {
+    await histimag(bot, message);
+});
+
+bot.onText(/^\/help/, (message) => {
+    helpCommand(bot, message);
+});
 
 bot.onText(/\/adddev (\d+)/, async (msg, match) => {
     const user_id = msg.from.id;
@@ -96,6 +143,7 @@ bot.onText(/\/adddev (\d+)/, async (msg, match) => {
     );
     await bot.sendMessage(user_id, `Usuário ${userId} foi promovido a dev.`);
 });
+
 
 bot.onText(/\/deldev (\d+)/, async (msg, match) => {
     const user_id = msg.from.id;
@@ -217,440 +265,6 @@ bot.onText(/^\/grupos/, async (message) => {
         console.error(error);
     }
 });
-
-bot.on("message", async (msg) => {
-    try {
-        if (
-            msg.chat.type === "private" &&
-            msg.entities &&
-            msg.entities[0].type === "bot_command"
-        ) {
-            const existingUser = await UserModel.findOne({
-                user_id: msg.from.id,
-            });
-            if (existingUser) {
-                return;
-            }
-
-            const user = new UserModel({
-                user_id: msg.from.id,
-                username: msg.from.username,
-                firstname: msg.from.first_name,
-                lastname: msg.from.last_name,
-                msg_private: true,
-            });
-
-            await user.save();
-            console.log(`Usuário ${msg.from.id} salvo no banco de dados.`);
-
-            const message = `#Fatoshistbot #New_User
-        <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname
-                }</a>
-        <b>ID:</b> <code>${user.user_id}</code>
-        <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"
-                }`;
-            bot.sendMessage(groupId, message, { parse_mode: "HTML" });
-        }
-    } catch (error) {
-        console.error(
-            `Erro em salvar o usuário ${msg.from.id} no banco de dados: ${error.message}`
-        );
-    }
-});
-
-bot.on("polling_error", (error) => {
-    console.error(error);
-});
-
-bot.on("new_chat_members", async (msg) => {
-    const chatId = msg.chat.id;
-    const chatName = msg.chat.title;
-
-    try {
-        if (parseInt(chatId) === parseInt(groupId)) {
-            console.log(
-                `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
-            );
-        } else {
-            const chat = await ChatModel.findOne({ chatId: chatId });
-
-            if (chat) {
-                console.log(
-                    `Grupo ${chatName} (${chatId}) já existe no banco de dados`
-                );
-            } else {
-                const newChat = await ChatModel.create({
-                    chatId,
-                    chatName,
-                    forwarding: true,
-                });
-                console.log(
-                    `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
-                );
-
-                const botUser = await bot.getMe();
-                const newMembers = msg.new_chat_members.filter(
-                    (member) => member.id === botUser.id
-                );
-
-                let chatusername;
-                if (msg.chat.username) {
-                    chatusername = `@${msg.chat.username}`;
-                } else {
-                    chatusername = "Private Group";
-                }
-
-                if (newMembers.length > 0) {
-                    const message = `#Fatoshistbot #New_Group
-                    <b>Group:</b> ${chatName}
-                    <b>ID:</b> <code>${chatId}</code>
-                    <b>Link:</b> ${chatusername}`;
-
-                    bot.sendMessage(groupId, message, {
-                        parse_mode: "HTML",
-                    }).catch((error) => {
-                        console.error(
-                            `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
-                        );
-                    });
-                }
-
-                bot.sendMessage(
-                    chatId,
-                    "Olá, meu nome é Fatos Históricos! Obrigado por me adicionar em seu grupo.\n\nEu enviarei mensagens todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos, conceda-me as permissões de administrador para fixar mensagens e convidar usuários via link.",
-                    {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [
-                                    {
-                                        text: "Canal Oficial 🇧🇷",
-                                        url: "https://t.me/hoje_na_historia",
-                                    },
-                                ],
-                                [
-                                    {
-                                        text: "Relatar bugs",
-                                        url: "https://t.me/kylorensbot",
-                                    },
-                                ],
-                            ],
-                        },
-                    }
-                ).catch((error) => {
-                    console.error(
-                        `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
-                    );
-                });
-            }
-        }
-
-        try {
-            const developerMembers = await Promise.all(
-                msg.new_chat_members.map(async (member) => {
-                    if (member.is_bot === false && (await is_dev(member.id))) {
-                        const user = await UserModel.findOne({ user_id: member.id });
-                        if (user && user.is_dev === true) {
-                            return member;
-                        }
-                    }
-                })
-            );
-
-            if (developerMembers && developerMembers.length > 0) {
-                const developerMember = developerMembers.find((member) => member !== undefined);
-                if (developerMember) {
-                    const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMember.id}">${developerMember.first_name}</a> 😎👍`;
-                    bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch((error) => {
-                        console.error(`Erro ao enviar mensagem para o grupo ${chatId}: ${error}`);
-                    });
-                }
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    } catch (err) {
-        console.error(err);
-    }
-});
-
-bot.on("left_chat_member", async (msg) => {
-    const botUser = await bot.getMe();
-    if (msg.left_chat_member.id === botUser.id && msg.chat.id === groupId) {
-        console.log("Bot left the group!");
-
-        try {
-            const chatId = msg.chat.id;
-            const chat = await ChatModel.findOneAndDelete({ chatId });
-            console.log(
-                `Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`
-            );
-        } catch (err) {
-            console.error(err);
-        }
-    }
-});
-
-let day, month;
-
-async function getHistoricalEvents() {
-    const today = new Date();
-    day = today.getDate();
-    month = today.getMonth() + 1;
-
-    const response = await axios.get(
-        `https://www.educabras.com/hoje_na_historia/buscar/${day}/${month}`
-    );
-    const $ = cheerio.load(response.data);
-    const eventDiv = $(".nascido_neste_dia");
-    let eventText = eventDiv.text().trim();
-
-    return eventText;
-}
-
-bot.onText(/\/settopic/, async (msg) => {
-    if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') {
-        await bot.sendMessage(msg.chat.id, 'Esse comando só pode ser enviado em grupos.');
-        return;
-    }
-
-    const chatId = msg.chat.id;
-    const threadId = msg.reply_to_message?.message_thread_id;
-    const chatMember = await bot.getChatMember(chatId, msg.from.id);
-
-    if (chatMember.status !== 'administrator' && chatMember.status !== 'creator') {
-        return;
-    }
-
-    try {
-        const chat = await ChatModel.findOne({ chatId });
-
-        if (chat) {
-            if (threadId === "1" || !threadId) {
-                chat.thread_id = null;
-                await chat.save();
-                bot.sendMessage(chatId, "Será enviado as mensagens aqui!", { message_thread_id: chat.thread_id });
-            } else if (chat.thread_id === threadId) {
-                bot.sendMessage(chatId, `Este chat já está definido para receber mensagens do tópico ${threadId}.`, { message_thread_id: chat.thread_id });
-            } else {
-                chat.thread_id = threadId;
-                await chat.save();
-                bot.sendMessage(chatId, `Thread ID atualizado para: ${threadId}, agora você receberá as mensagens históricas aqui!`, { message_thread_id: threadId });
-            }
-        } else {
-            const newChat = new ChatModel({ chatId, thread_id: threadId });
-            await newChat.save();
-            bot.sendMessage(chatId, `Thread ID definido como: ${threadId}, agora você receberá as mensagens históricas aqui!`, { message_thread_id: threadId });
-        }
-    } catch (error) {
-        console.error("Error setting thread ID:", error.message);
-    }
-});
-
-bot.onText(/\/cleartopic/, async (msg) => {
-    if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') {
-        await bot.sendMessage(msg.chat.id, 'Esse comando só pode ser enviado em grupos.');
-        return;
-    }
-
-    const chatId = msg.chat.id;
-    const chatMember = await bot.getChatMember(chatId, msg.from.id);
-
-    if (chatMember.status !== 'administrator' && chatMember.status !== 'creator') {
-        return;
-    }
-
-    try {
-        const chat = await ChatModel.findOne({ chatId });
-
-        if (chat) {
-            chat.thread_id = null;
-            await chat.save();
-            bot.sendMessage(chatId, "O tópico foi removido com sucesso. Você não receberá mais mensagens históricas aqui.");
-        } else {
-            bot.sendMessage(chatId, "Você ainda não definiu um tópico. Use o comando /settopic para definir um tópico.");
-        }
-    } catch (error) {
-        console.error("Error clearing thread ID:", error.message);
-    }
-});
-
-
-
-
-
-async function sendHistoricalEventsGroup(chatId) {
-    try {
-        const chat = await ChatModel.findOne({ chatId });
-        const topic = chat.thread_id;
-        const events = await getHistoricalEvents();
-        const inlineKeyboard = {
-            inline_keyboard: [
-                [
-                    {
-                        text: "📢 Canal Oficial",
-                        url: "https://t.me/hoje_na_historia",
-                    },
-                ],
-            ],
-        };
-
-        if (events) {
-            const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-            bot.sendMessage(chatId, message, {
-                parse_mode: "HTML",
-                reply_markup: inlineKeyboard,
-                message_thread_id: topic,
-            }).catch(error => {
-                console.error("Error sending message:", error.message);
-            });
-        } else {
-            bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
-                parse_mode: "HTML",
-                reply_markup: inlineKeyboard,
-                message_thread_id: topic,
-            }).catch(error => {
-                console.error("Error sending message:", error.message);
-            });
-        }
-    } catch (error) {
-        console.error("Error sending historical events:", error.message);
-    }
-}
-
-const manhaJob = new CronJob(
-    "00 08 * * *",
-    async function () {
-        try {
-            const chatModels = await ChatModel.find({});
-            for (const chatModel of chatModels) {
-                const chatId = chatModel.chatId;
-                if (chatId !== groupId) {
-                    try {
-                        sendHistoricalEventsGroup(chatId);
-                        console.log(
-                            `Mensagem enviada com sucesso para o grupo ${chatId}`
-                        );
-                    } catch (error) {
-                        console.error(
-                            `Error sending historical events to group ${chatId}:`,
-                            error.message
-                        );
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error in morning job:", error.message);
-        }
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-manhaJob.start();
-
-
-
-async function sendHistoricalEventsChannel(channelId) {
-    const events = await getHistoricalEvents();
-    if (events) {
-        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-        bot.sendMessage(channelId, message, { parse_mode: "HTML" });
-    } else {
-        bot.sendMessage(
-            channelId,
-            "<b>Não há eventos históricos para hoje.</b>",
-            { parse_mode: "HTML" }
-        );
-    }
-}
-
-const channelJob = new CronJob(
-    "0 5 * * *",
-    function () {
-        sendHistoricalEventsChannel(channelId);
-        console.log(`Mensagem enviada com sucesso para o canal ${channelId}`);
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-channelJob.start();
-
-exports.initHandler = () => {
-    return bot;
-};
-
-async function sendHistoricalEventsUser(userId) {
-    const user = await UserModel.findOne({ user_id: userId });
-    const events = await getHistoricalEvents();
-    const inlineKeyboard = {
-        inline_keyboard: [
-            [
-                {
-                    text: "📢 Canal Oficial",
-                    url: "https://t.me/hoje_na_historia",
-                },
-            ],
-        ],
-    };
-
-    if (events) {
-        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
-        try {
-            const sentMessage = await bot.sendMessage(userId, message, {
-                parse_mode: "HTML",
-                reply_markup: inlineKeyboard,
-            });
-
-            const messageId = sentMessage.message_id;
-
-            user.messageId = messageId;
-            await user.save();
-
-            console.log(`Mensagem enviada com sucesso para o usuário ${userId}`);
-        } catch (error) {
-            console.log(`Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`);
-            if (error.response && error.response.statusCode === 403) {
-                await UserModel.findOneAndUpdate({ user_id: userId }, { msg_private: false });
-                console.log(`O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`);
-            }
-        }
-    } else {
-        bot.sendMessage(userId, "<b>Não há eventos históricos para hoje.</b>", {
-            parse_mode: "HTML",
-            reply_markup: inlineKeyboard,
-        });
-    }
-}
-
-const userJob = new CronJob(
-    "30 8 * * *",
-    async function () {
-        const users = await UserModel.find({ msg_private: true });
-        for (const user of users) {
-            const userId = user.user_id;
-            const messageId = user.messageId;
-
-            if (messageId) {
-                try {
-                    await bot.deleteMessage(userId, messageId);
-                    console.log(`Mensagem anterior do usuário ${userId} excluída com sucesso`);
-                } catch (error) {
-                    console.log(`Erro ao excluir mensagem anterior do usuário ${userId}: ${error.message}`);
-                }
-            }
-
-            await sendHistoricalEventsUser(userId);
-        }
-    },
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-userJob.start();
 
 bot.onText(/\/stats/, async (msg) => {
     const chatId = msg.chat.id;
@@ -1186,46 +800,6 @@ bot.onText(/\/banned/, async (message) => {
     });
 });
 
-async function sendStatus() {
-    const start = new Date();
-    const replied = await bot.sendMessage(channelStatusId, "Bot is ON");
-    const end = new Date();
-    const m_s = end - start;
-    const uptime = process.uptime();
-    const uptime_formatted = timeFormatter(uptime);
-    const numUsers = await UserModel.countDocuments();
-    const numChats = await ChatModel.countDocuments();
-    await bot.editMessageText(
-        `#Fatoshistbot #Status\n\nStatus: ON\nPing: \`${m_s}ms\`\nUptime: \`${uptime_formatted}\`\nUsers: \`${numUsers}\`\nChats: \`${numChats}\``,
-        {
-            chat_id: replied.chat.id,
-            message_id: replied.message_id,
-            parse_mode: "Markdown",
-        }
-    );
-}
-
-function timeFormatter(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-
-    const hoursFormatted = String(hours).padStart(2, "0");
-    const minutesFormatted = String(minutes).padStart(2, "0");
-    const secondsFormatted = String(secs).padStart(2, "0");
-
-    return `${hoursFormatted}:${minutesFormatted}:${secondsFormatted}`;
-}
-
-const job = new CronJob(
-    "03 00 12 * * *",
-    sendStatus,
-    null,
-    true,
-    "America/Sao_Paulo"
-);
-
-
 bot.onText(/\/sendoff/, async (msg) => {
     if (msg.chat.type !== "private") {
         return;
@@ -1386,7 +960,45 @@ bot.onText(/\/sendgp/, async (msg, match) => {
     );
 });
 
+bot.on("message", async (msg) => {
+    try {
+        if (
+            msg.chat.type === "private" &&
+            msg.entities &&
+            msg.entities[0].type === "bot_command"
+        ) {
+            const existingUser = await UserModel.findOne({
+                user_id: msg.from.id,
+            });
+            if (existingUser) {
+                return;
+            }
 
+            const user = new UserModel({
+                user_id: msg.from.id,
+                username: msg.from.username,
+                firstname: msg.from.first_name,
+                lastname: msg.from.last_name,
+                msg_private: true,
+            });
+
+            await user.save();
+            console.log(`Usuário ${msg.from.id} salvo no banco de dados.`);
+
+            const message = `#Fatoshistbot #New_User
+        <b>User:</b> <a href="tg://user?id=${user.user_id}">${user.firstname
+                }</a>
+        <b>ID:</b> <code>${user.user_id}</code>
+        <b>Username:</b> ${user.username ? `@${user.username}` : "Não informado"
+                }`;
+            bot.sendMessage(groupId, message, { parse_mode: "HTML" });
+        }
+    } catch (error) {
+        console.error(
+            `Erro em salvar o usuário ${msg.from.id} no banco de dados: ${error.message}`
+        );
+    }
+});
 
 bot.onText(/\/fwdoff/, async (msg) => {
     if (msg.chat.type !== "group" && msg.chat.type !== "supergroup") {
@@ -1500,6 +1112,399 @@ bot.onText(/\/fwrds/, async (msg) => {
     }
 });
 
+bot.onText(/\/settopic/, async (msg) => {
+    if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') {
+        await bot.sendMessage(msg.chat.id, 'Esse comando só pode ser enviado em grupos.');
+        return;
+    }
+
+    const chatId = msg.chat.id;
+    const threadId = msg.reply_to_message?.message_thread_id;
+    const chatMember = await bot.getChatMember(chatId, msg.from.id);
+
+    if (chatMember.status !== 'administrator' && chatMember.status !== 'creator') {
+        return;
+    }
+
+    try {
+        const chat = await ChatModel.findOne({ chatId });
+
+        if (chat) {
+            if (threadId === "1" || !threadId) {
+                chat.thread_id = null;
+                await chat.save();
+                bot.sendMessage(chatId, "Será enviado as mensagens aqui!", { message_thread_id: chat.thread_id });
+            } else if (chat.thread_id === threadId) {
+                bot.sendMessage(chatId, `Este chat já está definido para receber mensagens do tópico ${threadId}.`, { message_thread_id: chat.thread_id });
+            } else {
+                chat.thread_id = threadId;
+                await chat.save();
+                bot.sendMessage(chatId, `Thread ID atualizado para: ${threadId}, agora você receberá as mensagens históricas aqui!`, { message_thread_id: threadId });
+            }
+        } else {
+            const newChat = new ChatModel({ chatId, thread_id: threadId });
+            await newChat.save();
+            bot.sendMessage(chatId, `Thread ID definido como: ${threadId}, agora você receberá as mensagens históricas aqui!`, { message_thread_id: threadId });
+        }
+    } catch (error) {
+        console.error("Error setting thread ID:", error.message);
+    }
+});
+
+bot.onText(/\/cleartopic/, async (msg) => {
+    if (msg.chat.type !== 'group' && msg.chat.type !== 'supergroup') {
+        await bot.sendMessage(msg.chat.id, 'Esse comando só pode ser enviado em grupos.');
+        return;
+    }
+
+    const chatId = msg.chat.id;
+    const chatMember = await bot.getChatMember(chatId, msg.from.id);
+
+    if (chatMember.status !== 'administrator' && chatMember.status !== 'creator') {
+        return;
+    }
+
+    try {
+        const chat = await ChatModel.findOne({ chatId });
+
+        if (chat) {
+            chat.thread_id = null;
+            await chat.save();
+            bot.sendMessage(chatId, "O tópico foi removido com sucesso. Você não receberá mais mensagens históricas aqui.");
+        } else {
+            bot.sendMessage(chatId, "Você ainda não definiu um tópico. Use o comando /settopic para definir um tópico.");
+        }
+    } catch (error) {
+        console.error("Error clearing thread ID:", error.message);
+    }
+});
+
+
+bot.on("new_chat_members", async (msg) => {
+    const chatId = msg.chat.id;
+    const chatName = msg.chat.title;
+
+    try {
+        if (parseInt(chatId) === parseInt(groupId)) {
+            console.log(
+                `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
+            );
+        } else {
+            const chat = await ChatModel.findOne({ chatId: chatId });
+
+            if (chat) {
+                console.log(
+                    `Grupo ${chatName} (${chatId}) já existe no banco de dados`
+                );
+            } else {
+                const newChat = await ChatModel.create({
+                    chatId,
+                    chatName,
+                    forwarding: true,
+                });
+                console.log(
+                    `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
+                );
+
+                const botUser = await bot.getMe();
+                const newMembers = msg.new_chat_members.filter(
+                    (member) => member.id === botUser.id
+                );
+
+                let chatusername;
+                if (msg.chat.username) {
+                    chatusername = `@${msg.chat.username}`;
+                } else {
+                    chatusername = "Private Group";
+                }
+
+                if (newMembers.length > 0) {
+                    const message = `#Fatoshistbot #New_Group
+                    <b>Group:</b> ${chatName}
+                    <b>ID:</b> <code>${chatId}</code>
+                    <b>Link:</b> ${chatusername}`;
+
+                    bot.sendMessage(groupId, message, {
+                        parse_mode: "HTML",
+                    }).catch((error) => {
+                        console.error(
+                            `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
+                        );
+                    });
+                }
+
+                bot.sendMessage(
+                    chatId,
+                    "Olá, meu nome é Fatos Históricos! Obrigado por me adicionar em seu grupo.\n\nEu enviarei mensagens todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos, conceda-me as permissões de administrador para fixar mensagens e convidar usuários via link.",
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: "Canal Oficial 🇧🇷",
+                                        url: "https://t.me/hoje_na_historia",
+                                    },
+                                ],
+                                [
+                                    {
+                                        text: "Relatar bugs",
+                                        url: "https://t.me/kylorensbot",
+                                    },
+                                ],
+                            ],
+                        },
+                    }
+                ).catch((error) => {
+                    console.error(
+                        `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
+                    );
+                });
+            }
+        }
+
+        try {
+            const developerMembers = await Promise.all(
+                msg.new_chat_members.map(async (member) => {
+                    if (member.is_bot === false && (await is_dev(member.id))) {
+                        const user = await UserModel.findOne({ user_id: member.id });
+                        if (user && user.is_dev === true) {
+                            return member;
+                        }
+                    }
+                })
+            );
+
+            if (developerMembers && developerMembers.length > 0) {
+                const developerMember = developerMembers.find((member) => member !== undefined);
+                if (developerMember) {
+                    const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMember.id}">${developerMember.first_name}</a> 😎👍`;
+                    bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch((error) => {
+                        console.error(`Erro ao enviar mensagem para o grupo ${chatId}: ${error}`);
+                    });
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+bot.on("left_chat_member", async (msg) => {
+    const botUser = await bot.getMe();
+    if (msg.left_chat_member.id === botUser.id && msg.chat.id === groupId) {
+        console.log("Bot left the group!");
+
+        try {
+            const chatId = msg.chat.id;
+            const chat = await ChatModel.findOneAndDelete({ chatId });
+            console.log(
+                `Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    }
+});
+
+
+
+let day, month;
+
+async function getHistoricalEvents() {
+    const today = new Date();
+    day = today.getDate();
+    month = today.getMonth() + 1;
+
+    try {
+        const jsonEvents = require("../collections/eventos.json");
+        const events = jsonEvents[`${month}-${day}`];
+
+        if (events) {
+            return events.join('\n\n');
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error reading events from JSON:", error.message);
+        return null;
+    }
+}
+
+
+async function sendHistoricalEventsGroup(chatId) {
+    try {
+        const today = new Date();
+        const day = today.getDate();
+        const month = today.getMonth() + 1;
+        const chat = await ChatModel.findOne({ chatId });
+        const topic = chat.thread_id;
+        const events = await getHistoricalEvents();
+        const inlineKeyboard = {
+            inline_keyboard: [
+                [
+                    {
+                        text: "📢 Canal Oficial",
+                        url: "https://t.me/hoje_na_historia",
+                    },
+                ],
+            ],
+        };
+
+        if (events) {
+            const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+            await bot.sendMessage(chatId, message, {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+                message_thread_id: topic,
+            }).catch(error => {
+                console.error("Error sending message:", error.message);
+            });
+        } else {
+            await bot.sendMessage(chatId, "<b>Não há eventos históricos para hoje.</b>", {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+                message_thread_id: topic,
+            }).catch(error => {
+                console.error("Error sending message:", error.message);
+            });
+        }
+    } catch (error) {
+        console.error("Error sending historical events:", error.message);
+    }
+}
+
+const manhaJob = new CronJob(
+    "00 08 * * *",
+    async function () {
+        try {
+            const chatModels = await ChatModel.find({});
+            for (const chatModel of chatModels) {
+                const chatId = chatModel.chatId;
+                if (chatId !== groupId) {
+                    try {
+                        sendHistoricalEventsGroup(chatId);
+                        console.log(
+                            `Mensagem enviada com sucesso para o grupo ${chatId}`
+                        );
+                    } catch (error) {
+                        console.error(
+                            `Error sending historical events to group ${chatId}:`,
+                            error.message
+                        );
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error in morning job:", error.message);
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+manhaJob.start();
+
+
+
+async function sendHistoricalEventsChannel(channelId) {
+    const events = await getHistoricalEvents();
+    if (events) {
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        await bot.sendMessage(channelId, message, { parse_mode: "HTML" });
+    } else {
+        bot.sendMessage(
+            channelId,
+            "<b>Não há eventos históricos para hoje.</b>",
+            { parse_mode: "HTML" }
+        );
+    }
+}
+
+const channelJob = new CronJob(
+    "0 5 * * *",
+    function () {
+        sendHistoricalEventsChannel(channelId);
+        console.log(`Mensagem enviada com sucesso para o canal ${channelId}`);
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+
+channelJob.start();
+
+
+async function sendHistoricalEventsUser(userId) {
+    const user = await UserModel.findOne({ user_id: userId });
+    const events = await getHistoricalEvents();
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [
+                {
+                    text: "📢 Canal Oficial",
+                    url: "https://t.me/hoje_na_historia",
+                },
+            ],
+        ],
+    };
+
+    if (events) {
+        const message = `<b>HOJE NA HISTÓRIA</b>\n\n📅 Acontecimento em <b>${day}/${month}</b>\n\n<i>${events}</i>`;
+        try {
+            const sentMessage = await bot.sendMessage(userId, message, {
+                parse_mode: "HTML",
+                reply_markup: inlineKeyboard,
+            });
+
+            const messageId = sentMessage.message_id;
+
+            user.messageId = messageId;
+            await user.save();
+
+            console.log(`Mensagem enviada com sucesso para o usuário ${userId}`);
+        } catch (error) {
+            console.log(`Erro ao enviar mensagem para o usuário ${userId}: ${error.message}`);
+            if (error.response && error.response.statusCode === 403) {
+                await UserModel.findOneAndUpdate({ user_id: userId }, { msg_private: false });
+                console.log(`O usuário ${userId} bloqueou o bot e foi removido das mensagens privadas`);
+            }
+        }
+    } else {
+        bot.sendMessage(userId, "<b>Não há eventos históricos para hoje.</b>", {
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
+        });
+    }
+}
+
+const userJob = new CronJob(
+    "30 8 * * *",
+    async function () {
+        const users = await UserModel.find({ msg_private: true });
+        for (const user of users) {
+            const userId = user.user_id;
+            const messageId = user.messageId;
+
+            if (messageId) {
+                try {
+                    await bot.deleteMessage(userId, messageId);
+                    console.log(`Mensagem anterior do usuário ${userId} excluída com sucesso`);
+                } catch (error) {
+                    console.log(`Erro ao excluir mensagem anterior do usuário ${userId}: ${error.message}`);
+                }
+            }
+
+            await sendHistoricalEventsUser(userId);
+        }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+);
+userJob.start();
+
 async function sendMessageToChannel(message) {
     try {
         await bot.sendMessage(channelId, message, { parse_mode: "HTML" });
@@ -1561,6 +1566,7 @@ const death = new CronJob(
     "America/Sao_Paulo"
 );
 death.start();
+
 
 async function getBirthsOfTheDay() {
     const today = new Date();
@@ -1670,6 +1676,7 @@ const holiday = new CronJob(
 );
 holiday.start();
 
+
 async function sendHistoricalEventsGroupImage(chatId) {
     const today = new Date();
     const day = today.getDate();
@@ -1742,17 +1749,8 @@ const tardJob = new CronJob(
     true,
     "America/Sao_Paulo"
 );
-
-
 tardJob.start();
 
-function getMonthName(month) {
-    const monthNames = [
-        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
-        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
-    ];
-    return monthNames[month - 1];
-}
 
 async function getholidayOfTheDay() {
     const today = new Date();
@@ -1792,6 +1790,38 @@ const holidaybr = new CronJob(
 );
 holidaybr.start();
 
+
+
+bot.on("polling_error", (error) => {
+    console.error(error);
+});
+
+exports.initHandler = () => {
+    return bot;
+};
+
+function sendBotOnlineMessage() {
+    console.log(`Fatoshistbot iniciado com sucesso...`);
+    bot.sendMessage(groupId, `#Fatoshistbot #ONLINE\n\nBot is now playing ...`);
+}
+
+function sendBotOfflineMessage() {
+    console.log(`Fatoshistbot encerrado com sucesso...`);
+    bot.sendMessage(groupId, `#Fatoshistbot #OFFLINE\n\nBot is now off ...`)
+        .then(() => {
+            process.exit(0); // Encerra o processo do bot após enviar a mensagem offline
+        })
+        .catch((error) => {
+            console.error("Erro ao enviar mensagem de desligamento:", error);
+            process.exit(1); // Encerra o processo com um código de erro
+        });
+}
+
+process.on('SIGINT', () => {
+    sendBotOfflineMessage();
+});
+
+sendBotOnlineMessage();
 
 // NOVIDADE 2024
 
@@ -1912,26 +1942,4 @@ holidaybr.start();
 //);
 // frase.start();
 
-function sendBotOnlineMessage() {
-    console.log(`Fatoshistbot iniciado com sucesso...`);
-    bot.sendMessage(groupId, `#Fatoshistbot #ONLINE\n\nBot is now playing ...`);
-}
-
-function sendBotOfflineMessage() {
-    console.log(`Fatoshistbot encerrado com sucesso...`);
-    bot.sendMessage(groupId, `#Fatoshistbot #OFFLINE\n\nBot is now off ...`)
-        .then(() => {
-            process.exit(0); // Encerra o processo do bot após enviar a mensagem offline
-        })
-        .catch((error) => {
-            console.error("Erro ao enviar mensagem de desligamento:", error);
-            process.exit(1); // Encerra o processo com um código de erro
-        });
-}
-
-process.on('SIGINT', () => {
-    sendBotOfflineMessage();
-});
-
-sendBotOnlineMessage();
 
