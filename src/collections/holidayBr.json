@@ -1919,7 +1919,7 @@
     ]
   },
   "11-03": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Instituição do Direito de Voto da Mulher"
       }
@@ -1948,9 +1948,7 @@
       },
       {
         "name": "Dia do Técnico em Eletrônica"
-      }
-    ],
-    "events": [
+      },
       {
         "name": "Dia Nacional da Língua Portuguesa"
       },
@@ -1970,9 +1968,7 @@
     "births": [
       {
         "name": "Dia do Radiologista"
-      }
-    ],
-    "events": [
+      },
       {
         "name": "Dia Mundial do Urbanismo"
       }
@@ -1982,9 +1978,7 @@
     "births": [
       {
         "name": "Dia do Hoteleiro"
-      }
-    ],
-    "events": [
+      },
       {
         "name": "Dia Internacional contra o Fascismo e o Antissemitismo"
       }
@@ -2001,7 +1995,7 @@
     ]
   },
   "11-14": {
-    "events": [
+    "births": [
       {
         "name": "Dia Nacional da Alfabetização"
       },
@@ -2011,7 +2005,7 @@
     ]
   },
   "11-15": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Proclamação da República"
       },
@@ -2024,16 +2018,14 @@
     "births": [
       {
         "name": "Dia do Conselheiro Tutelar"
-      }
-    ],
-    "events": [
+      },
       {
         "name": "Dia Nacional do Notário e do Registrador"
       }
     ]
   },
   "11-19": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Bandeira Nacional"
       },
@@ -2043,7 +2035,7 @@
     ]
   },
   "11-20": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Consciência Negra"
       },
@@ -2073,7 +2065,7 @@
     ]
   },
   "11-25": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Baiana de Acarajé"
       }
@@ -2087,21 +2079,21 @@
     ]
   },
   "12-01": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Numismata"
       }
     ]
   },
   "12-02": {
-    "events": [
+    "births": [
       {
         "name": "Dia Nacional das Relações Públicas"
       }
     ]
   },
   "12-03": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Delegado de Polícia"
       },
@@ -2120,14 +2112,14 @@
     ]
   },
   "12-04": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Médico de Família e Comunidade"
       }
     ]
   },
   "12-05": {
-    "events": [
+    "births": [
       {
         "name": "Dia Nacional da Silvicultura"
       },
@@ -2137,7 +2129,7 @@
     ]
   },
   "12-08": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Justiça"
       },
@@ -2147,14 +2139,14 @@
     ]
   },
   "12-09": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Fonoaudiólogo"
       }
     ]
   },
   "12-10": {
-    "events": [
+    "births": [
       {
         "name": "Dia da Bíblia"
       },
@@ -2167,14 +2159,14 @@
     ]
   },
   "12-11": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Engenheiro Civil"
       }
     ]
   },
   "12-13": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Engenheiro Avaliador e Perito de Engenharia"
       },
@@ -2205,35 +2197,35 @@
     ]
   },
   "12-18": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Museólogo"
       }
     ]
   },
   "12-20": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Mecânico"
       }
     ]
   },
   "12-22": {
-    "events": [
+    "births": [
       {
         "name": "Início do Verão"
       }
     ]
   },
   "12-25": {
-    "events": [
+    "births": [
       {
         "name": "Natal"
       }
     ]
   },
   "12-28": {
-    "events": [
+    "births": [
       {
         "name": "Dia do Salva-vidas"
       },
@@ -2243,7 +2235,7 @@
     ]
   },
   "12-31": {
-    "events": [
+    "births": [
       {
         "name": "Réveillon"
       }
