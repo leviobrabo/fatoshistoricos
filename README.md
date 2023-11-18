@@ -1,4 +1,4 @@
-<img src="https://imgur.com/gallery/udgvfFq" align="right" width="200" height="200"/>
+<img src="https://i.imgur.com/OQKrs8P.jpeg" align="right" width="200" height="200"/>
 
 # Fatos Históricos
 [![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
