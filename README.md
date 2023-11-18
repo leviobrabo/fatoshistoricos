@@ -1,6 +1,7 @@
 <img src="https://imgur.com/gallery/udgvfFq" align="right" width="200" height="200"/>
 
-# Fatos Históricos[![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
+# Fatos Históricos
+[![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
 [![](https://img.shields.io/badge/Suporte-@kylorensbot-1b2069)](https://t.me/kylorensbot)
 [![](https://img.shields.io/badge/Telegram-@HojeNaHistoria-red)](https://t.me/hoje_na_historia)
 
