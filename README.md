@@ -1,18 +1,34 @@
-# Fatos Históricos
+<img src="https://imgur.com/gallery/udgvfFq" align="right" width="200" height="200"/>
 
-## Bot que envia fatos históricos do dia
-
-## E agora...
-
-## Envia curiosidade históricas
-## Frases históricas
-## Feriados
-## Nascidos do dia
-## Mortes do dia
-
-[![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
+# Fatos Históricos[![](https://img.shields.io/badge/Telegram-@fatoshistbot-blue)](https://t.me/fatoshistbot)
 [![](https://img.shields.io/badge/Suporte-@kylorensbot-1b2069)](https://t.me/kylorensbot)
 [![](https://img.shields.io/badge/Telegram-@HojeNaHistoria-red)](https://t.me/hoje_na_historia)
+
+
+
+[Fatos Históricos](https://t.me/hoje_na_historia) é um bot para telegram que tem como objetivo propagar o conhecimento de história e bem como levar o conhecimento de forma "leve" e "tranquila" para todo o público.
+
+## Funcionalidades
+
+* Envia eventos históricos do dia
+  - Chat privado (8h)
+  - Canal (5h3min)
+  - Grupos (8h)
+  
+* Envia frases históricas
+* Envia Feriados do dia
+* Envia Nascido do dia
+* Envia mortos do dia
+* Envia imagens de eventos históricos
+  - Chat privado
+  - Canal
+  - Grupos
+    
+* Envia curiosidade históricas
+* Envia data comemorativas
+
+
+
 [![](https://i.imgur.com/MzZuN3G.jpeg)](#)
 
 ### Pré-requisitos
