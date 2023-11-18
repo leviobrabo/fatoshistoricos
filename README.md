@@ -39,6 +39,7 @@ Você vai precisar ter instalado em sua máquina as seguintes ferramentas:
 -   [Git](https://git-scm.com)
 -   [Node.js](https://nodejs.org/en/)
 -   [MongoDB](https://cloud.mongodb.com/)
+-   [WIKIMEDIA](https://api.wikimedia.org/wiki/Feed_API/Reference/On_this_day)
 
 ### 🤖 Deploy no Heroku
 
