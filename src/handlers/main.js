@@ -1703,7 +1703,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
         const chat = await ChatModel.findOne({ chatId });
         const topic = chat.thread_id;
 
-        const caption = `<b>Você sabia?</b>\n\nEm ${day}/${getMonthName(month)}/${event.year}\n\n<code>${event.text}</code>`;
+        const caption = `<b>Você sabia?</b>\n\nEm <b>${day} de ${getMonthName(month)} de ${event.year}</b>\n\n<code>${event.text}</code>`;
 
         if (event.pages && event.pages[0].thumbnail) {
             const photoUrl = event.pages[0].thumbnail.source;
@@ -1730,7 +1730,7 @@ async function sendHistoricalEventsGroupImage(chatId) {
 }
 
 const tardJob = new CronJob(
-    "20 18 * * *",
+    "00 15 * * *",
     async function () {
         const chatModels = await ChatModel.find({ forwarding: true });
         for (const chatModel of chatModels) {
