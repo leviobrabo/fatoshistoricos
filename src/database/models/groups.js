@@ -1,16 +1,16 @@
 const { Schema } = require("mongoose");
 
 const ChatSchema = new Schema({
-    chatId: {
+    chat_id: {
         type: Number,
         required: true,
         unique: true,
     },
-    chatName: {
+    chat_name: {
         type: String,
         required: false,
     },
-    isBlocked: {
+    blocked: {
         type: Boolean,
         required: true,
         default: false,
@@ -23,6 +23,11 @@ const ChatSchema = new Schema({
     thread_id: {
         type: Number,
         required: false,
+    },
+    question: {
+        type: Boolean,
+        required: true,
+        default: false,
     }
 });
 

@@ -1945,35 +1945,3 @@ sendBotOnlineMessage();
 
 
 
-async function alterarEsquema() {
-    try {
-        const chatsComProblemas = await ChatModel.find({ chatId: { $exists: true } }).sort({ chatId: 1 });
-
-        let chatIdAnterior = null;
-        let chatIdAtual;
-
-        for (const chat of chatsComProblemas) {
-            chatIdAtual = chat.chatId;
-
-            if (chatIdAtual !== null && chatIdAtual !== undefined && chatIdAtual !== chatIdAnterior) {
-                await ChatModel.deleteOne({ _id: chat._id });
-            }
-
-            chatIdAnterior = chatIdAtual;
-        }
-
-        await ChatModel.updateMany(
-            { chatId: { $exists: true } },
-            {
-                $rename: { "chatId": "chat_id", "chatName": "chat_name", "isBlocked": "blocked" },
-                $set: { "question": false }
-            }
-        );
-
-        console.log('Alterações realizadas com sucesso.');
-    } catch (error) {
-        console.error('Erro ao tentar alterar o esquema:', error);
-    }
-}
-
-alterarEsquema();
