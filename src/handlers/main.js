@@ -1942,7 +1942,6 @@ sendBotOnlineMessage();
 //);
 // frase.start();
 
-
 // Evento para escutar mensagens recebidas
 bot.on('message', async (msg) => {
     try {
