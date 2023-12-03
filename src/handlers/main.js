@@ -1943,33 +1943,33 @@ sendBotOnlineMessage();
 // frase.start();
 
 
-
 // Evento para escutar mensagens recebidas
 bot.on('message', async (msg) => {
     try {
         const chatId = msg.chat.id;
-        const chatType = msg.chat.type; // Obtém o tipo de chat
+        const chatType = msg.chat.type;
 
         if (chatType === 'group' || chatType === 'supergroup') {
-            // Verifica se o chat já existe no banco de dados
-            const existingChat = await ChatModel.findOne({ chat_id: chatId });
+            if (chatId) {
+                const existingChat = await ChatModel.findOne({ chat_id: chatId });
 
-            if (!existingChat) {
-                // Se o chat não existe, adiciona ao banco de dados
-                const newChat = new ChatModel({
-                    chat_id: chatId,
-                    chat_name: msg.chat.title || '', // Nome do chat (se disponível)
-                    blocked: false,
-                    forwarding: true,
-                    thread_id: msg.message_id,
-                    question: false
-                });
+                if (!existingChat) {
+                    const newChat = new ChatModel({
+                        chat_id: chatId,
+                        chat_name: msg.chat.title || '',
+                        blocked: false,
+                        forwarding: true,
+                        thread_id: msg.message_id,
+                        question: false
+                    });
 
-                // Salva o novo chat no banco de dados
-                await newChat.save();
-                console.log('Novo chat adicionado ao banco de dados:', newChat);
+                    await newChat.save();
+                    console.log('Novo chat adicionado ao banco de dados:', newChat);
+                } else {
+                    console.log('Chat já existe no banco de dados:', existingChat);
+                }
             } else {
-                console.log('Chat já existe no banco de dados:', existingChat);
+                console.log('chatId está nulo ou não está presente na mensagem.');
             }
         }
     } catch (error) {
