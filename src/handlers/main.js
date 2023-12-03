@@ -1942,26 +1942,26 @@ sendBotOnlineMessage();
 //);
 // frase.start();
 
+
+
+
 async function alterarEsquema() {
     try {
-        // Encontrar documentos com chatId nulo ou duplicado
         const chatsComProblemas = await ChatModel.find({ chatId: { $exists: true } }).sort({ chatId: 1 });
 
         let chatIdAnterior = null;
         let chatIdAtual;
 
-        // Lidar com documentos que têm chatId nulo ou duplicado
         for (const chat of chatsComProblemas) {
             chatIdAtual = chat.chatId;
 
-            if (chatIdAtual === null || chatIdAtual === undefined || chatIdAtual === chatIdAnterior) {
-                await chat.remove(); // Remover o documento duplicado ou nulo
+            if (chatIdAtual !== null && chatIdAtual !== undefined && chatIdAtual !== chatIdAnterior) {
+                await chat.remove();
             }
 
             chatIdAnterior = chatIdAtual;
         }
 
-        // Realizar a atualização do esquema para renomear e adicionar o novo campo
         await ChatModel.updateMany(
             { chatId: { $exists: true } },
             {
