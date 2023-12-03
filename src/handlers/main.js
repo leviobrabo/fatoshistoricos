@@ -1943,3 +1943,24 @@ sendBotOnlineMessage();
 // frase.start();
 
 
+
+async function alterarEsquema() {
+    try {
+        // Atualiza os documentos no banco de dados para refletir as alterações no esquema
+        await UserModel.updateMany(
+            {},
+            {
+                $rename: { "firstname": "first_name", "lastname": "last_name" },
+                $unset: { "createdAt": "", "updatedAt": "" },
+                $rename: { "is_dev": "sudo", "messageId": "message_id" },
+                $set: { "hits": 0, "questions": 0, "progress": 0 }
+            }
+        );
+
+        console.log('Alterações realizadas com sucesso.');
+    } catch (error) {
+        console.error('Erro ao tentar alterar o esquema:', error);
+    }
+}
+
+alterarEsquema();
