@@ -14,26 +14,26 @@ const channelStatusId = process.env.channelStatusId;
 const groupId = process.env.groupId;
 const owner = process.env.ownerId
 
-const chatCommands = [
-    { comand: 'help', description: 'Mais informações e lista de comandos' },
-    { comand: 'fotoshist', description: 'Fotos históricas' },
-    { comand: 'sendoff', description: 'Desabilita envio de mensagens de fatos históricos em privado' },
-    { comand: 'sendon', description: 'Ativa o envio de mensagens de fatos históricos em privado' },
-];
-bot.setMyCommands(chatCommands, { scope: JSON.stringify({ type: 'all_private_chats' }) });
+// const chatCommands = [
+//     { comand: 'help', description: 'Mais informações e lista de comandos' },
+//     { comand: 'fotoshist', description: 'Fotos históricas' },
+//     { comand: 'sendoff', description: 'Desabilita envio de mensagens de fatos históricos em privado' },
+//     { comand: 'sendon', description: 'Ativa o envio de mensagens de fatos históricos em privado' },
+// ];
+// bot.setMyCommands(chatCommands, { scope: JSON.stringify({ type: 'all_private_chats' }) });
 
-const groupCommands = [
-    { comand: 'help', description: 'Mais informações e lista de comandos' },
-];
+// const groupCommands = [
+//     { comand: 'help', description: 'Mais informações e lista de comandos' },
+// ];
 
-bot.setMyCommands(groupCommands, { scope: JSON.stringify({ type: 'all_group_chats' }) });
+// bot.setMyCommands(groupCommands, { scope: JSON.stringify({ type: 'all_group_chats' }) });
 
-const adminCommands = [
-    { comand: 'fwdon', description: 'Receber indicação no grupo' },
-    { comand: 'fwdoff', description: 'Não receber encaminhamento no grupo' },
-];
+// const adminCommands = [
+//     { comand: 'fwdon', description: 'Receber indicação no grupo' },
+//     { comand: 'fwdoff', description: 'Não receber encaminhamento no grupo' },
+// ];
 
-bot.setMyCommands(adminCommands, { scope: JSON.stringify({ type: 'all_chat_administrators' }) });
+// bot.setMyCommands(adminCommands, { scope: JSON.stringify({ type: 'all_chat_administrators' }) });
 
 
 async function is_dev(user_id) {
