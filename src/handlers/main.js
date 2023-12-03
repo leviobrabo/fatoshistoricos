@@ -1944,13 +1944,18 @@ sendBotOnlineMessage();
 
 async function alterarEsquema() {
     try {
-        await UserModel.updateMany(
-            {},
-            {
-                $set: { "hits": 0, "questions": 0, "progress": 0 }
-            },
-            { multi: true } // Certifique-se de adicionar esta opção para atualizar vários documentos
-        );
+        // Encontrar todos os documentos na coleção UserModel
+        const usuarios = await UserModel.find({});
+
+        // Iterar sobre cada usuário e adicionar os campos se não estiverem presentes
+        for (const usuario of usuarios) {
+            if (!usuario.hits || !usuario.questions || !usuario.progress) {
+                usuario.hits = 0;
+                usuario.questions = 0;
+                usuario.progress = 0;
+                await usuario.save(); // Salvar as alterações no documento
+            }
+        }
 
         console.log('Alterações realizadas com sucesso.');
     } catch (error) {
@@ -1959,4 +1964,3 @@ async function alterarEsquema() {
 }
 
 alterarEsquema();
-
