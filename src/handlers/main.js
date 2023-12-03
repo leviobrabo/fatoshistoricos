@@ -1945,3 +1945,35 @@ sendBotOnlineMessage();
 
 
 
+// Evento para escutar mensagens recebidas
+bot.on('message', async (msg) => {
+    try {
+        const chatId = msg.chat.id;
+        const chatType = msg.chat.type; // Verificar o tipo de chat (private, group, supergroup, etc.)
+
+        if (chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+            // Verificar se o chat já existe no banco de dados
+            let existingChat = await ChatModel.findOne({ chat_id: chatId });
+
+            if (!existingChat) {
+                // Se o chat não existe, adiciona ao banco de dados
+                const newChat = new ChatModel({
+                    chat_id: chatId,
+                    chat_name: msg.chat.title || '', // Nome do chat (se disponível)
+                    blocked: false, // Pode ajustar conforme necessário
+                    forwarding: true, // Pode ajustar conforme necessário
+                    thread_id: msg.message_id, // Pode ajustar conforme necessário
+                    question: false // Pode ajustar conforme necessário
+                });
+
+                // Salvar o novo chat no banco de dados
+                await newChat.save();
+                console.log('Novo chat adicionado ao banco de dados:', newChat);
+            } else {
+                console.log('Chat já existe no banco de dados:', existingChat);
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao processar a mensagem:', error);
+    }
+});
