@@ -1180,133 +1180,133 @@ bot.onText(/\/cleartopic/, async (msg) => {
 });
 
 
-bot.on("new_chat_members", async (msg) => {
-    const chatId = msg.chat.id;
-    const chatName = msg.chat.title;
+// bot.on("new_chat_members", async (msg) => {
+//     const chatId = msg.chat.id;
+//     const chatName = msg.chat.title;
 
-    try {
-        if (parseInt(chatId) === parseInt(groupId)) {
-            console.log(
-                `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
-            );
-        } else {
-            const chat = await ChatModel.findOne({ chatId: chatId });
+//     try {
+//         if (parseInt(chatId) === parseInt(groupId)) {
+//             console.log(
+//                 `O chatId ${chatId} é igual ao groupId ${groupId}. Não será salvo no banco de dados.`
+//             );
+//         } else {
+//             const chat = await ChatModel.findOne({ chatId: chatId });
 
-            if (chat) {
-                console.log(
-                    `Grupo ${chatName} (${chatId}) já existe no banco de dados`
-                );
-            } else {
-                const newChat = await ChatModel.create({
-                    chatId,
-                    chatName,
-                    forwarding: true,
-                });
-                console.log(
-                    `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
-                );
+//             if (chat) {
+//                 console.log(
+//                     `Grupo ${chatName} (${chatId}) já existe no banco de dados`
+//                 );
+//             } else {
+//                 const newChat = await ChatModel.create({
+//                     chatId,
+//                     chatName,
+//                     forwarding: true,
+//                 });
+//                 console.log(
+//                     `Grupo ${newChat.chatName} (${newChat.chatId}) adicionado ao banco de dados`
+//                 );
 
-                const botUser = await bot.getMe();
-                const newMembers = msg.new_chat_members.filter(
-                    (member) => member.id === botUser.id
-                );
+//                 const botUser = await bot.getMe();
+//                 const newMembers = msg.new_chat_members.filter(
+//                     (member) => member.id === botUser.id
+//                 );
 
-                let chatusername;
-                if (msg.chat.username) {
-                    chatusername = `@${msg.chat.username}`;
-                } else {
-                    chatusername = "Private Group";
-                }
+//                 let chatusername;
+//                 if (msg.chat.username) {
+//                     chatusername = `@${msg.chat.username}`;
+//                 } else {
+//                     chatusername = "Private Group";
+//                 }
 
-                if (newMembers.length > 0) {
-                    const message = `#Fatoshistbot #New_Group
-                    <b>Group:</b> ${chatName}
-                    <b>ID:</b> <code>${chatId}</code>
-                    <b>Link:</b> ${chatusername}`;
+//                 if (newMembers.length > 0) {
+//                     const message = `#Fatoshistbot #New_Group
+//                     <b>Group:</b> ${chatName}
+//                     <b>ID:</b> <code>${chatId}</code>
+//                     <b>Link:</b> ${chatusername}`;
 
-                    bot.sendMessage(groupId, message, {
-                        parse_mode: "HTML",
-                    }).catch((error) => {
-                        console.error(
-                            `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
-                        );
-                    });
-                }
+//                     bot.sendMessage(groupId, message, {
+//                         parse_mode: "HTML",
+//                     }).catch((error) => {
+//                         console.error(
+//                             `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
+//                         );
+//                     });
+//                 }
 
-                bot.sendMessage(
-                    chatId,
-                    "Olá, meu nome é Fatos Históricos! Obrigado por me adicionar em seu grupo.\n\nEu enviarei mensagens todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos, conceda-me as permissões de administrador para fixar mensagens e convidar usuários via link.",
-                    {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [
-                                    {
-                                        text: "Canal Oficial 🇧🇷",
-                                        url: "https://t.me/hoje_na_historia",
-                                    },
-                                ],
-                                [
-                                    {
-                                        text: "Relatar bugs",
-                                        url: "https://t.me/kylorensbot",
-                                    },
-                                ],
-                            ],
-                        },
-                    }
-                ).catch((error) => {
-                    console.error(
-                        `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
-                    );
-                });
-            }
-        }
+//                 bot.sendMessage(
+//                     chatId,
+//                     "Olá, meu nome é Fatos Históricos! Obrigado por me adicionar em seu grupo.\n\nEu enviarei mensagens todos os dias às 8 horas e possuo alguns comandos.\n\nSe quiser receber mais fatos históricos, conceda-me as permissões de administrador para fixar mensagens e convidar usuários via link.",
+//                     {
+//                         reply_markup: {
+//                             inline_keyboard: [
+//                                 [
+//                                     {
+//                                         text: "Canal Oficial 🇧🇷",
+//                                         url: "https://t.me/hoje_na_historia",
+//                                     },
+//                                 ],
+//                                 [
+//                                     {
+//                                         text: "Relatar bugs",
+//                                         url: "https://t.me/kylorensbot",
+//                                     },
+//                                 ],
+//                             ],
+//                         },
+//                     }
+//                 ).catch((error) => {
+//                     console.error(
+//                         `Erro ao enviar mensagem para o grupo ${chatId}: ${error}`
+//                     );
+//                 });
+//             }
+//         }
 
-        try {
-            const developerMembers = await Promise.all(
-                msg.new_chat_members.map(async (member) => {
-                    if (member.is_bot === false && (await is_dev(member.id))) {
-                        const user = await UserModel.findOne({ user_id: member.id });
-                        if (user && user.is_dev === true) {
-                            return member;
-                        }
-                    }
-                })
-            );
+//         try {
+//             const developerMembers = await Promise.all(
+//                 msg.new_chat_members.map(async (member) => {
+//                     if (member.is_bot === false && (await is_dev(member.id))) {
+//                         const user = await UserModel.findOne({ user_id: member.id });
+//                         if (user && user.is_dev === true) {
+//                             return member;
+//                         }
+//                     }
+//                 })
+//             );
 
-            if (developerMembers && developerMembers.length > 0) {
-                const developerMember = developerMembers.find((member) => member !== undefined);
-                if (developerMember) {
-                    const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMember.id}">${developerMember.first_name}</a> 😎👍`;
-                    bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch((error) => {
-                        console.error(`Erro ao enviar mensagem para o grupo ${chatId}: ${error}`);
-                    });
-                }
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    } catch (err) {
-        console.error(err);
-    }
-});
+//             if (developerMembers && developerMembers.length > 0) {
+//                 const developerMember = developerMembers.find((member) => member !== undefined);
+//                 if (developerMember) {
+//                     const message = `👨‍💻 <b>Um dos meus desenvolvedores entrou no grupo:</b> <a href="tg://user?id=${developerMember.id}">${developerMember.first_name}</a> 😎👍`;
+//                     bot.sendMessage(chatId, message, { parse_mode: "HTML" }).catch((error) => {
+//                         console.error(`Erro ao enviar mensagem para o grupo ${chatId}: ${error}`);
+//                     });
+//                 }
+//             }
+//         } catch (err) {
+//             console.error(err);
+//         }
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
-bot.on("left_chat_member", async (msg) => {
-    const botUser = await bot.getMe();
-    if (msg.left_chat_member.id === botUser.id && msg.chat.id === groupId) {
-        console.log("Bot left the group!");
+// bot.on("left_chat_member", async (msg) => {
+//     const botUser = await bot.getMe();
+//     if (msg.left_chat_member.id === botUser.id && msg.chat.id === groupId) {
+//         console.log("Bot left the group!");
 
-        try {
-            const chatId = msg.chat.id;
-            const chat = await ChatModel.findOneAndDelete({ chatId });
-            console.log(
-                `Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`
-            );
-        } catch (err) {
-            console.error(err);
-        }
-    }
-});
+//         try {
+//             const chatId = msg.chat.id;
+//             const chat = await ChatModel.findOneAndDelete({ chatId });
+//             console.log(
+//                 `Grupo ${chat.chatName} (${chat.chatId}) removido do banco de dados`
+//             );
+//         } catch (err) {
+//             console.error(err);
+//         }
+//     }
+// });
 
 
 
@@ -1942,6 +1942,9 @@ sendBotOnlineMessage();
 //);
 // frase.start();
 
+
+
+
 // Evento para escutar mensagens recebidas
 bot.on('message', async (msg) => {
     try {
@@ -1950,20 +1953,23 @@ bot.on('message', async (msg) => {
 
         if (chatType === 'group' || chatType === 'supergroup') {
             if (chatId) {
-                const existingChat = await ChatModel.findOne({ chat_id: chatId });
+                const existingChat = await ChatModel.findOneAndUpdate(
+                    { chat_id: chatId },
+                    {
+                        $setOnInsert: {
+                            chat_id: chatId,
+                            chat_name: msg.chat.title || '',
+                            blocked: false,
+                            forwarding: true,
+                            thread_id: msg.message_id,
+                            question: false
+                        }
+                    },
+                    { upsert: true, new: true }
+                );
 
                 if (!existingChat) {
-                    const newChat = new ChatModel({
-                        chat_id: chatId,
-                        chat_name: msg.chat.title || '',
-                        blocked: false,
-                        forwarding: true,
-                        thread_id: msg.message_id,
-                        question: false
-                    });
-
-                    await newChat.save();
-                    console.log('Novo chat adicionado ao banco de dados:', newChat);
+                    console.log('Novo chat adicionado ao banco de dados');
                 } else {
                     console.log('Chat já existe no banco de dados:', existingChat);
                 }
