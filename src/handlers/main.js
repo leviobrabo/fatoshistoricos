@@ -1946,13 +1946,11 @@ sendBotOnlineMessage();
 
 async function alterarEsquema() {
     try {
-        // Atualiza os documentos no banco de dados para refletir as alterações no esquema
         await UserModel.updateMany(
             {},
             {
-                $rename: { "firstname": "first_name", "lastname": "last_name" },
+                $rename: { "firstname": "first_name", "lastname": "last_name", "is_dev": "sudo", "messageId": "message_id" },
                 $unset: { "createdAt": "", "updatedAt": "" },
-                $rename: { "is_dev": "sudo", "messageId": "message_id" },
                 $set: { "hits": 0, "questions": 0, "progress": 0 }
             }
         );
