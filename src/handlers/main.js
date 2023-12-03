@@ -1947,11 +1947,11 @@ async function alterarEsquema() {
         await UserModel.updateMany(
             { hits: { $exists: false }, questions: { $exists: false }, progress: { $exists: false } },
             {
-                $set: { "hits": 0, "questions": 0, "progress": 0 }
+                $set: { "hits": 0 }
             }
         );
 
-        console.log('Alterações realizadas com sucesso.');
+        console.log('Alterações realizadas hits com sucesso.');
     } catch (error) {
         console.error('Erro ao tentar alterar o esquema:', error);
     }
