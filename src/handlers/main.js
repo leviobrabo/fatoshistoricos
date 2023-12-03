@@ -1957,4 +1957,5 @@ async function alterarEsquema() {
     }
 }
 
-alterarEs
+alterarEsquema();
+
