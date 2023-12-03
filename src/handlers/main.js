@@ -1942,15 +1942,11 @@ sendBotOnlineMessage();
 //);
 // frase.start();
 
-
-
 async function alterarEsquema() {
     try {
         await UserModel.updateMany(
             {},
             {
-                $rename: { "firstname": "first_name", "lastname": "last_name", "is_dev": "sudo", "messageId": "message_id" },
-                $unset: { "createdAt": "", "updatedAt": "" },
                 $set: { "hits": 0, "questions": 0, "progress": 0 }
             }
         );
@@ -1961,4 +1957,4 @@ async function alterarEsquema() {
     }
 }
 
-alterarEsquema();
+alterarEs
