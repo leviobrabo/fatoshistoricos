@@ -1945,6 +1945,8 @@ sendBotOnlineMessage();
 
 
 
+const ChatModel = require('./path/to/ChatModel'); // Importe o modelo ChatModel
+
 async function alterarEsquema() {
     try {
         const chatsComProblemas = await ChatModel.find({ chatId: { $exists: true } }).sort({ chatId: 1 });
@@ -1956,7 +1958,7 @@ async function alterarEsquema() {
             chatIdAtual = chat.chatId;
 
             if (chatIdAtual !== null && chatIdAtual !== undefined && chatIdAtual !== chatIdAnterior) {
-                await chat.remove();
+                await ChatModel.deleteOne({ _id: chat._id });
             }
 
             chatIdAnterior = chatIdAtual;
