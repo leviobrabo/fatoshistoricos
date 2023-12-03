@@ -1945,8 +1945,6 @@ sendBotOnlineMessage();
 
 
 
-const ChatModel = require('./path/to/ChatModel'); // Importe o modelo ChatModel
-
 async function alterarEsquema() {
     try {
         const chatsComProblemas = await ChatModel.find({ chatId: { $exists: true } }).sort({ chatId: 1 });
