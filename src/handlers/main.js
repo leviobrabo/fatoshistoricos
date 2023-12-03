@@ -1952,7 +1952,7 @@ bot.on('message', async (msg) => {
         const chatType = msg.chat.type;
 
         if (chatType === 'group' || chatType === 'supergroup') {
-            if (chatId) {
+            if (chatId != null) { // Verifica se chatId não é nulo ou indefinido
                 const existingChat = await ChatModel.findOneAndUpdate(
                     { chat_id: chatId },
                     {
