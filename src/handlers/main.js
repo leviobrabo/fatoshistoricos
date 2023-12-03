@@ -1945,7 +1945,7 @@ sendBotOnlineMessage();
 async function alterarEsquema() {
     try {
         await UserModel.updateMany(
-            {},
+            { hits: { $exists: false }, questions: { $exists: false }, progress: { $exists: false } },
             {
                 $set: { "hits": 0, "questions": 0, "progress": 0 }
             }
@@ -1958,4 +1958,3 @@ async function alterarEsquema() {
 }
 
 alterarEsquema();
-
