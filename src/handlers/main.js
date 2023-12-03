@@ -1945,16 +1945,18 @@ sendBotOnlineMessage();
 async function alterarEsquema() {
     try {
         await UserModel.updateMany(
-            { hits: { $exists: false }, questions: { $exists: false }, progress: { $exists: false } },
+            {},
             {
-                $set: { "hits": 0 }
-            }
+                $set: { "hits": 0, "questions": 0, "progress": 0 }
+            },
+            { multi: true } // Certifique-se de adicionar esta opção para atualizar vários documentos
         );
 
-        console.log('Alterações realizadas hits com sucesso.');
+        console.log('Alterações realizadas com sucesso.');
     } catch (error) {
         console.error('Erro ao tentar alterar o esquema:', error);
     }
 }
 
 alterarEsquema();
+
